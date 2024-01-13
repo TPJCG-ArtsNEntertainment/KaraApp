@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RulesRegulations">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="411dp"
+        android:layout_height="729dp"
+        android:text="Following are the rules and regulations of  TPJCG Karaoke session that are to be followed strictly by everyone who attends the session. Those who do not follow them will face dire consequences. First time offenders who broke the rules will be noted down and warned. Second time offenders will be blacklisted and BANNED from attending karaoke sessions forever.  (This means throughout your school years in Temasek Polytechnic and even after you have graduated).  *Any enquires or problems, please pm the karaoke head.    1) RESPECT the hosts. Do not disrespect the hosts and follow the rules.  2) NO card games allowed in the venue or near the venue (Poker cards, Pokémon cards, Yu-Gi-Oh! cards, UNO cards, basically all card games known and unknown to mankind).  3) NO using of laptops or playing video games on laptops during the session is allowed.  4) ONLY Arts and Entertainment Sub-Committee members and AE alumni are allowed to touch and adjust the mixer. This also means that only AE members can stay behind the Kara table. The hosts can however, choose to let some people to stay around there. If something is damaged at the table, the hosts will be responsible for it.  "
+        android:textAlignment="textStart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

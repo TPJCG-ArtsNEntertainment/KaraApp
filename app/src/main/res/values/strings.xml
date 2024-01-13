@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">KaraApp</string>
+    <string name="item1">Main Activity</string>
+    <string name="item2">Add Music</string>
+    <string name="item3">Edit Music</string>
+    <string name="item4">Music History</string>
+    <string name="item5">Rules and Regulations</string>
+
+</resources>
