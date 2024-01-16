@@ -15,6 +15,12 @@ public class MusicPlayer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        uid = intent.getStringExtra("uid");
+        is_staff = intent.getStringExtra("is_staff");
+        is_staffBoolean = is_staff.equals("1");
     }
     @Override
     //add the option menu to the activity

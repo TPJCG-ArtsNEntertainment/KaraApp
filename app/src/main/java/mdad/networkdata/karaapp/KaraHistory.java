@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class KaraHistory extends AppCompatActivity {
@@ -17,7 +18,15 @@ public class KaraHistory extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_user);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        uid = intent.getStringExtra("uid");
+        is_staff = intent.getStringExtra("is_staff");
+        is_staffBoolean = is_staff.equals("1");
     }
+
+
     @Override
     //add the option menu to the activity
     public boolean onCreateOptionsMenu(Menu menu) {

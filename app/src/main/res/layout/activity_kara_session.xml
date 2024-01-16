@@ -55,7 +55,7 @@
                 android:text="Off" />
 
             <Button
-                android:id="@+id/btnAdd"
+                android:id="@+id/btnQueueAdd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="5dp"
@@ -80,11 +80,11 @@
             android:textStyle="bold" />
 
         <ListView
-            android:id="@+id/ListView"
+            android:id="@+id/listViewQueue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"></ListView>
+            android:visibility="gone"/>
 
         <LinearLayout
             android:id="@+id/mainPageButtonLinearLayout"
@@ -94,7 +94,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnEdit"
+                android:id="@+id/btnQueueEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -110,7 +110,7 @@
                 android:text="Played" />
 
             <Button
-                android:id="@+id/btnRemove"
+                android:id="@+id/btnQueueRemove"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

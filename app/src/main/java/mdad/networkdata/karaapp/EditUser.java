@@ -15,6 +15,12 @@ public class EditUser extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        uid = intent.getStringExtra("uid");
+        is_staff = intent.getStringExtra("is_staff");
+        is_staffBoolean = is_staff.equals("1");
     }
 
     @Override

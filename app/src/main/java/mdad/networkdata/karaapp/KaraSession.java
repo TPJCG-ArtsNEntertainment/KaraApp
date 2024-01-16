@@ -134,13 +134,13 @@ public class KaraSession extends AppCompatActivity {
 //        End of Logic
 
         // get resource id of ListView
-        listView = (ListView)findViewById(R.id.ListView);
+        listView = (ListView)findViewById(R.id.listViewQueue);
         // ArrayList to store product info in Hashmap for ListView
         musicsList = new ArrayList<HashMap<String, String>>();
         // re-usable method to use Volley to retrieve products from database
         postData(url_all_queue_musics, null, get_all_queue_music);
 
-        btnAddMusic = (Button) findViewById(R.id.btnAdd);
+        btnAddMusic = (Button) findViewById(R.id.btnQueueAdd);
         btnAddMusic.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -169,7 +169,7 @@ public class KaraSession extends AppCompatActivity {
             }
         });
 
-        btnEditMusic = (Button) findViewById(R.id.btnEdit);
+        btnEditMusic = (Button) findViewById(R.id.btnQueueEdit);
         btnEditMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -194,7 +194,7 @@ public class KaraSession extends AppCompatActivity {
             }
         });
 
-        btnRemoveMusic = (Button) findViewById(R.id.btnRemove);
+        btnRemoveMusic = (Button) findViewById(R.id.btnQueueRemove);
         btnRemoveMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -273,7 +273,7 @@ public class KaraSession extends AppCompatActivity {
                             //populate the listview with product information from Hashmap
                             ListAdapter adapter = new SimpleAdapter(
                                             KaraSession.this, musicsList,
-                                            R.layout.list_view_items, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"}, new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
+                                            R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"}, new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
                                     ){
                                     @Override
                                     public View getView(int position, View convertView, ViewGroup parent) {

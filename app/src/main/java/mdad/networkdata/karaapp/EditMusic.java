@@ -39,11 +39,11 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
 public class EditMusic extends AppCompatActivity {
-    String mid, music_name, music_artist, music_url, created_at, created_by, is_played;
+    String uid, is_staff, mid, music_name, music_artist, music_url, created_at, created_by, is_played;
     EditText editTextMusic, editTextArtist, editTextUrl;
     Button btnEditAttach, btnEditSubmit;
     YouTubePlayer youTubePlayer;
-    private boolean isFullscreen = false;
+    private boolean isFullscreen = false, is_staffBoolean;
     private final int get_music_details = 1, update_music = 2;
     private static final String url_music_details = KaraSession.ipBaseAddress+"get_music_detailsVolley.php";
     private static final String url_update_product = KaraSession.ipBaseAddress+"update_musicVolley.php";
@@ -59,6 +59,9 @@ public class EditMusic extends AppCompatActivity {
         editTextUrl = (EditText) findViewById(R.id.inputEditUrl);
 
         Intent intent = getIntent();
+        uid = intent.getStringExtra("uid");
+        is_staff = intent.getStringExtra("is_staff");
+        is_staffBoolean = is_staff.equals("1");
         mid = intent.getStringExtra("mid");
         Map<String,String> param_mid = new HashMap<String, String>();
         param_mid.put("mid",mid);
@@ -232,46 +235,46 @@ public class EditMusic extends AppCompatActivity {
     //add the option menu to the activity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the option menu and display the option items when clicked;
-        if(isFullscreen) {
-            getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        String className = getClass().getSimpleName();
+        String[] words = className.split("(?=[A-Z])");
+        className = String.join(" ", words).trim();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.getTitle().toString().equals(className)) {
+                item.setVisible(false);
+            }
+        }
+        if (!is_staffBoolean) {
+            menu.findItem(R.id.item5).setVisible(false);
         }
         return true;
     }
-
     @Override
+    //when the option item is selected
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId( );
-        if (id == R.id.item1) {
-            Toast.makeText(getApplicationContext(),"Main Activity Selected",Toast.LENGTH_LONG).show();
-            // To navigate to KaraSession
-            Intent i = new Intent(EditMusic.this, KaraSession.class);
-            startActivity(i);
-            return true;
+        int id = item.getItemId();
+        // Array of menu items with their corresponding destination classes
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
+        Class<?>[] destinationClasses = {KaraSession.class, KaraHistory.class, MusicPlayer.class, MusicLyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        // Iterate over menu items and check conditions
+        for (int i = 0; i < menuItems.length; i++) {
+            if (id == menuItems[i]) {
+                // Start the activity for the selected menu item
+                startActivityIntent(destinationClasses[i]);
+                return true;
+            } else if (id == android.R.id.home) {
+                onBackPressed();
+                return true;
+            }
         }
-        else if (id == R.id.item2) {
-            Toast.makeText(getApplicationContext(),"Add Music Selected",Toast.LENGTH_LONG).show();
-            Intent i = new Intent(EditMusic.this, AddMusic.class);
-            startActivity(i);
-            return true;
-        }
-        else if (id == R.id.item3) {
-            Toast.makeText(getApplicationContext(),"Edit Music Selected",Toast.LENGTH_LONG).show();
-            return true;
-        }
-        else if (id == R.id.item4) {
-            Toast.makeText(getApplicationContext(),"Music History Selected",Toast.LENGTH_LONG).show();
-            Intent i = new Intent(EditMusic.this, KaraHistory.class);
-            startActivity(i);
-            return true;
-        }
-        else if (id == R.id.item5) {
-            Toast.makeText(getApplicationContext(),"Rules and Regulations Selected",Toast.LENGTH_LONG).show();
-            Intent i = new Intent(EditMusic.this, RulesAndRegulations.class);
-            startActivity(i);
-            return true;
-        } else if (id == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }else return super.onOptionsItemSelected(item);
+        // If the selected item is not found in the loop, fallback to super.onOptionsItemSelected
+        return super.onOptionsItemSelected(item);
+    }
+    private void startActivityIntent(Class<?> cls) {
+        Intent intent = new Intent(EditMusic.this, cls);
+        intent.putExtra("uid", uid);
+        intent.putExtra("is_staff", is_staff);
+        startActivity(intent);
     }
 }
