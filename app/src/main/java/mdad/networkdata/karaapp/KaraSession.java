@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.Color;
@@ -49,7 +50,7 @@ import java.util.regex.Pattern;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
-public class MainMenu extends AppCompatActivity {
+public class KaraSession extends AppCompatActivity {
     Button btnAddMusic, btnEditMusic, btnPlayedMusic, btnRemoveMusic, btnPower;
     YouTubePlayer youTubePlayer;
     ListView listView;
@@ -57,22 +58,22 @@ public class MainMenu extends AppCompatActivity {
     ImageView closedSessionImage;
     TextView closedSessionLabel;
     ArrayList<HashMap<String, String>> musicsList;
-    private boolean isFullscreen = false, power;
+    private boolean isFullscreen = false, is_staffBoolean, power;
     private int selectedPosition = -1;
-    private String selectedMusicId, selectedMusicName, selectedMusicArtist, selectedMusicUrl;
+    private String selectedMusicId, selectedMusicName, selectedMusicArtist, selectedMusicUrl, uid, is_staff;
     private final int get_all_queue_music = 1, update_delete_music =2, get_power=3, update_power=4;
     // url to get all products list via the php file get_all_productsJson.php
     public static String ipBaseAddress = "http://aetpjcgkara.atspace.cc/";
-    private static String url_all_queue_musics = MainMenu.ipBaseAddress+"get_all_musicQueueVolley.php";
-    private static String url_update_musio = MainMenu.ipBaseAddress+"update_musicVolley.php";
-    private static String url_delete_music = MainMenu.ipBaseAddress+"delete_musicVolley.php";
-    private static String url_get_power = MainMenu.ipBaseAddress+"get_powerVolley.php";
-    private static String url_update_power = MainMenu.ipBaseAddress+"update_powerVolley.php";
+    private static String url_all_queue_musics = KaraSession.ipBaseAddress+"get_all_musicQueueVolley.php";
+    private static String url_update_musio = KaraSession.ipBaseAddress+"update_musicVolley.php";
+    private static String url_delete_music = KaraSession.ipBaseAddress+"delete_musicVolley.php";
+    private static String url_get_power = KaraSession.ipBaseAddress+"get_powerVolley.php";
+    private static String url_update_power = KaraSession.ipBaseAddress+"update_powerVolley.php";
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_kara_session);
 
 //        YoutubePlayer Logic
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
@@ -93,11 +94,11 @@ public class MainMenu extends AppCompatActivity {
                 fullscreenViewContainer.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.addView(fullscreenView);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Window window = MainMenu.this.getWindow();
+                    Window window = KaraSession.this.getWindow();
                     window.setDecorFitsSystemWindows(false);
-                    window.setNavigationBarColor(MainMenu.this.getResources().getColor(android.R.color.black));
+                    window.setNavigationBarColor(KaraSession.this.getResources().getColor(android.R.color.black));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) MainMenu.this).getSupportActionBar();
+                    ActionBar actionBar = ((AppCompatActivity) KaraSession.this).getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.hide();
                     }
@@ -111,11 +112,11 @@ public class MainMenu extends AppCompatActivity {
                 fullscreenViewContainer.setVisibility(View.GONE);
                 fullscreenViewContainer.removeAllViews();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Window window = MainMenu.this.getWindow();
+                    Window window = KaraSession.this.getWindow();
                     window.setDecorFitsSystemWindows(true);
-                    window.setNavigationBarColor(MainMenu.this.getResources().getColor(android.R.color.transparent));
+                    window.setNavigationBarColor(KaraSession.this.getResources().getColor(android.R.color.transparent));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) MainMenu.this).getSupportActionBar();
+                    ActionBar actionBar = ((AppCompatActivity) KaraSession.this).getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.show();
                     }
@@ -125,7 +126,7 @@ public class MainMenu extends AppCompatActivity {
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(YouTubePlayer youTubePlayer) {
-                MainMenu.this.youTubePlayer = youTubePlayer;
+                KaraSession.this.youTubePlayer = youTubePlayer;
                 youTubePlayer.loadVideo("7L3Hdp86aio", 0f);
             }
         }, iFramePlayerOptions);
@@ -139,17 +140,6 @@ public class MainMenu extends AppCompatActivity {
         // re-usable method to use Volley to retrieve products from database
         postData(url_all_queue_musics, null, get_all_queue_music);
 
-//        // Overrided by listView's button
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                String mid = ((TextView) view.findViewById(R.id.mid)).getText().toString();
-//                selectedMusicId = mid;
-//                String music_name = ((TextView) view.findViewById(R.id.mName)).getText().toString();
-//                Toast.makeText(getApplicationContext(),music_name+" selected",Toast.LENGTH_LONG).show();
-//            }
-//        });
-
         btnAddMusic = (Button) findViewById(R.id.btnAdd);
         btnAddMusic.setOnClickListener(new View.OnClickListener()
         {
@@ -157,7 +147,7 @@ public class MainMenu extends AppCompatActivity {
             public void onClick(View view)
             {
             //Create an Intent here to load the second activity
-                Intent intent = new Intent(MainMenu.this, AddMusic.class);
+                Intent intent = new Intent(KaraSession.this, AddMusic.class);
                 startActivity(intent);
             }
         });
@@ -217,12 +207,13 @@ public class MainMenu extends AppCompatActivity {
 
 //        Check Staff
         Intent intent = getIntent();
-        String is_staffString = intent.getStringExtra("is_staff");
-        Boolean is_staff = is_staffString.equals("1");
-        if(!is_staff){
+        uid = intent.getStringExtra("uid");
+        is_staff = intent.getStringExtra("is_staff");
+        is_staffBoolean = is_staff.equals("1");
+        if(!is_staffBoolean){
             buttonLinearLayout.setVisibility(View.GONE);
             btnPower.setVisibility(View.GONE);
-        }else if(is_staff){
+        }else if(is_staffBoolean){
             buttonLinearLayout.setVisibility(View.VISIBLE);
             btnPower.setVisibility(View.VISIBLE);
         }
@@ -237,6 +228,7 @@ public class MainMenu extends AppCompatActivity {
     }
 
     public void postData(String url, Map params, final int requestType) {
+        Context context = this;
         //create a RequestQueue for Volley
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         //create a StringRequest for Volley for HTTP Post
@@ -280,7 +272,7 @@ public class MainMenu extends AppCompatActivity {
                             }
                             //populate the listview with product information from Hashmap
                             ListAdapter adapter = new SimpleAdapter(
-                                            MainMenu.this, musicsList,
+                                            KaraSession.this, musicsList,
                                             R.layout.list_view_items, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"}, new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
                                     ){
                                     @Override
@@ -305,12 +297,14 @@ public class MainMenu extends AppCompatActivity {
 
                                                 buttonLinearLayout.setVisibility(View.VISIBLE);
 
-                                                btnEditMusic.setClickable(true);
-                                                btnEditMusic.setBackgroundColor(0xFF6200EE);
-                                                btnPlayedMusic.setClickable(true);
-                                                btnPlayedMusic.setBackgroundColor(0xFF6200EE);
-                                                btnRemoveMusic.setClickable(true);
-                                                btnRemoveMusic.setBackgroundColor(0xFF6200EE);
+                                                if(is_staffBoolean) {
+                                                    btnEditMusic.setClickable(true);
+                                                    btnEditMusic.setBackgroundColor(0xFF6200EE);
+                                                    btnPlayedMusic.setClickable(true);
+                                                    btnPlayedMusic.setBackgroundColor(0xFF6200EE);
+                                                    btnRemoveMusic.setClickable(true);
+                                                    btnRemoveMusic.setBackgroundColor(0xFF6200EE);
+                                                }
 
                                                 selectedPosition = position;
                                                 notifyDataSetChanged();
@@ -363,6 +357,7 @@ public class MainMenu extends AppCompatActivity {
                                 closedSessionLabel.setVisibility(View.GONE);
                                 listView.setVisibility(View.VISIBLE);
                                 btnAddMusic.setClickable(true);
+//                                btnAddMusic.setBackgroundColor(0xFF6200EE);
                                 btnAddMusic.setBackgroundColor(0xFF6200EE);
                                 btnPower.setText("Off");
                                 btnPower.setBackgroundColor(0xFFFF0000);
@@ -436,41 +431,47 @@ public class MainMenu extends AppCompatActivity {
     @Override
     //add the option menu to the activity
     public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the option menu and display the option items when clicked;
-        if(!isFullscreen) {
-            getMenuInflater().inflate(R.menu.menu_main, menu);
+        // Inflate the option menu and display the option items when clicked;
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        String className = getClass().getSimpleName();
+        String[] words = className.split("(?=[A-Z])");
+        className = String.join(" ", words).trim();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.getTitle().toString().equals(className)) {
+                item.setVisible(false);
+            }
+        }
+        if (!is_staffBoolean) {
+            menu.findItem(R.id.item5).setVisible(false);
         }
         return true;
     }
     @Override
     //when the option item is selected
     public boolean onOptionsItemSelected(MenuItem item) {
-    // get the id of the selected option item
-        int id = item.getItemId( );
-        if (id == R.id.item1) { // MainMenu option is selected
-            Toast.makeText(getApplicationContext(),"Main Activity Selected",Toast.LENGTH_LONG).show();
-            return true;
-        } else if (id == R.id.item2) { // SecondActivity option is selected
-            Toast.makeText(getApplicationContext(),"Add Music Selected",Toast.LENGTH_LONG).show();
-            // navigate to SecondActivity
-            Intent i = new Intent(MainMenu.this, AddMusic.class);
-            startActivity(i);
-            return true;
-        } else if (id == R.id.item3) {
-            Toast.makeText(getApplicationContext(),"Edit Music Selected",Toast.LENGTH_LONG).show();
-            Intent i = new Intent(MainMenu.this, EditMusic.class);
-            startActivity(i);
-            return true;
-        } else if (id == R.id.item4) {
-            Toast.makeText(getApplicationContext(),"Music History Selected",Toast.LENGTH_LONG).show();
-            Intent i = new Intent(MainMenu.this, MusicHistory.class);
-            startActivity(i);
-            return true;
-        } else if (id == R.id.item5) {
-            Toast.makeText(getApplicationContext(),"Rules and Regulations Selected",Toast.LENGTH_LONG).show();
-            Intent i = new Intent(MainMenu.this, RulesRegulations.class);
-            startActivity(i);
-            return true;
-        } else return super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+        // Array of menu items with their corresponding destination classes
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
+        Class<?>[] destinationClasses = {KaraSession.class, KaraHistory.class, MusicPlayer.class, MusicLyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        // Iterate over menu items and check conditions
+        for (int i = 0; i < menuItems.length; i++) {
+            if (id == menuItems[i]) {
+                // Start the activity for the selected menu item
+                startActivityIntent(destinationClasses[i]);
+                return true;
+            } else if (id == android.R.id.home) {
+                onBackPressed();
+                return true;
+            }
+        }
+        // If the selected item is not found in the loop, fallback to super.onOptionsItemSelected
+        return super.onOptionsItemSelected(item);
+    }
+    private void startActivityIntent(Class<?> cls) {
+        Intent intent = new Intent(KaraSession.this, cls);
+        intent.putExtra("uid", uid);
+        intent.putExtra("is_staff", is_staff);
+        startActivity(intent);
     }
 }

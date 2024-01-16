@@ -45,8 +45,8 @@ public class EditMusic extends AppCompatActivity {
     YouTubePlayer youTubePlayer;
     private boolean isFullscreen = false;
     private final int get_music_details = 1, update_music = 2;
-    private static final String url_music_details = MainMenu.ipBaseAddress+"get_music_detailsVolley.php";
-    private static final String url_update_product = MainMenu.ipBaseAddress+"update_musicVolley.php";
+    private static final String url_music_details = KaraSession.ipBaseAddress+"get_music_detailsVolley.php";
+    private static final String url_update_product = KaraSession.ipBaseAddress+"update_musicVolley.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,7 +181,7 @@ public class EditMusic extends AppCompatActivity {
                             if (response.trim().equals("Success")) {
                                 Toast.makeText(getApplicationContext(), "Success in updating database", Toast.LENGTH_LONG).show();
                                 finish();
-                                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                                Intent intent = new Intent(getApplicationContext(), KaraSession.class);
                                 startActivity(intent);
                             }
                         }
@@ -243,8 +243,8 @@ public class EditMusic extends AppCompatActivity {
         int id = item.getItemId( );
         if (id == R.id.item1) {
             Toast.makeText(getApplicationContext(),"Main Activity Selected",Toast.LENGTH_LONG).show();
-            // To navigate to MainMenu
-            Intent i = new Intent(EditMusic.this, MainMenu.class);
+            // To navigate to KaraSession
+            Intent i = new Intent(EditMusic.this, KaraSession.class);
             startActivity(i);
             return true;
         }
@@ -260,13 +260,13 @@ public class EditMusic extends AppCompatActivity {
         }
         else if (id == R.id.item4) {
             Toast.makeText(getApplicationContext(),"Music History Selected",Toast.LENGTH_LONG).show();
-            Intent i = new Intent(EditMusic.this, MusicHistory.class);
+            Intent i = new Intent(EditMusic.this, KaraHistory.class);
             startActivity(i);
             return true;
         }
         else if (id == R.id.item5) {
             Toast.makeText(getApplicationContext(),"Rules and Regulations Selected",Toast.LENGTH_LONG).show();
-            Intent i = new Intent(EditMusic.this, RulesRegulations.class);
+            Intent i = new Intent(EditMusic.this, RulesAndRegulations.class);
             startActivity(i);
             return true;
         } else if (id == android.R.id.home) {

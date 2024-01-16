@@ -1,9 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">KaraApp</string>
-    <string name="item1">Main Activity</string>
-    <string name="item2">Add Music</string>
-    <string name="item3">Edit Music</string>
-    <string name="item4">Music History</string>
-    <string name="item5">Rules and Regulations</string>
-
+    <string name="item1">Kara Session</string>
+    <string name="item2">Kara History</string>
+    <string name="item3">Music Player</string>
+    <string name="item4">Music Lyrics</string>
+    <string name="item5">User Management</string>
+    <string name="item6">Profile Settings</string>
+    <string name="item7">Rules And Regulations</string>
+    <string name="item8">Log Out</string>
 </resources>

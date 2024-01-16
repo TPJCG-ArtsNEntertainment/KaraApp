@@ -24,7 +24,7 @@ public class Register extends AppCompatActivity {
     EditText inputEmail, inputPassword, inputConfirmPassword, inputNickName;
     String email, password, confirmPassword, nickName;
     Button btnSubmitRegister, btnCancel;
-    private static String url_create_user = MainMenu.ipBaseAddress+"create_userVolley.php";
+    private static String url_create_user = KaraSession.ipBaseAddress+"create_userVolley.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
