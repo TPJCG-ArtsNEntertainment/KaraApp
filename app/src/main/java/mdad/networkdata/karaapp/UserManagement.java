@@ -6,10 +6,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ListView;
 
 public class UserManagement extends AppCompatActivity {
+    ListView listViewUser;
+    Button btnMakeStaff, btnCreateUser, btnEditUser, btnRemoveUser;
     String uid,is_staff;
     Boolean is_staffBoolean;
+    private static String url_get_all_users = KaraSession.ipBaseAddress+"get_all_userVolley";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +25,7 @@ public class UserManagement extends AppCompatActivity {
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
         is_staffBoolean = is_staff.equals("1");
+
     }
     @Override
     //add the option menu to the activity

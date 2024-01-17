@@ -78,10 +78,10 @@ public class Login extends AppCompatActivity {
                         String is_staff = details[4];
 
                         if (name == null){
-                            Toast.makeText(getApplicationContext(), "Logging in to"+email,
+                            Toast.makeText(getApplicationContext(), "Logging in to "+email,
                                     Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(getApplicationContext(), "Logging in to"+name,
+                            Toast.makeText(getApplicationContext(), "Logging in to "+name,
                                     Toast.LENGTH_LONG).show();
                         }
                         finish();

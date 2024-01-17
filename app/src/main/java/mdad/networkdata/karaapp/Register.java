@@ -48,7 +48,6 @@ public class Register extends AppCompatActivity {
                 if (!password.equals(confirmPassword)){
                     Toast.makeText(getApplicationContext(), "Password is not same as Confirm Password",
                             Toast.LENGTH_LONG).show();
-                    System.out.println(password+" "+confirmPassword);
                     return;
                 } else if (email.isEmpty() || password.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "No fields must be empty",
@@ -56,7 +55,7 @@ public class Register extends AppCompatActivity {
                     return;
                 }
 
-                Map<String,String> params_create = new HashMap<>();
+                Map<String,String> params_create = new HashMap<String, String>();
                 params_create.put("email", email);
                 params_create.put("password", password);
                 params_create.put("name", nickName);
