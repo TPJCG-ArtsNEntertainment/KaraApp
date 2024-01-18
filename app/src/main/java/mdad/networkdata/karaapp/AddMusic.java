@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -46,6 +47,7 @@ public class AddMusic extends AppCompatActivity {
     YouTubePlayer youTubePlayer; // Declare youTubePlayer here
     private boolean isFullscreen = false;
     private static String url_create_music = KaraSession.ipBaseAddress+"create_musicVolley.php";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +58,27 @@ public class AddMusic extends AppCompatActivity {
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
         is_staffBoolean = is_staff.equals("1");
+
+        Intent youtube = getIntent();
+        String currentUrl = intent.getStringExtra("currentUrl");
+
+        EditText editText = (EditText) findViewById(R.id.inputUrl);
+        editText.setText(currentUrl);
+
+        if (inputUrl != null) {
+            musicUrl = inputUrl.getText().toString();
+            String videoId = extractVideoId(musicUrl);
+            youTubePlayer.loadVideo(videoId,1);
+        }
+
+
+
+
+
+
+
+
+
 
 //        YoutubePlayer Logic
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
@@ -110,6 +133,10 @@ public class AddMusic extends AppCompatActivity {
             public void onReady(YouTubePlayer youTubePlayer) {
                 AddMusic.this.youTubePlayer = youTubePlayer;
                 youTubePlayer.loadVideo("7L3Hdp86aio", 0f);
+                if (currentUrl != null) {
+                    String videoId = extractVideoId(currentUrl);
+                    youTubePlayer.loadVideo(videoId,1);
+                }
             }
         }, iFramePlayerOptions);
         getLifecycle().addObserver(youTubePlayerView);
@@ -119,13 +146,20 @@ public class AddMusic extends AppCompatActivity {
         inputArtist = (EditText) findViewById(R.id.inputArtist);
         inputUrl = (EditText) findViewById(R.id.inputUrl);
 
+
+
         btnAttach = (Button) findViewById(R.id.btnAttach);
         btnAttach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                musicUrl = inputUrl.getText().toString();
-                String videoId = extractVideoId(musicUrl);
-                youTubePlayer.loadVideo(videoId,1);
+                //musicUrl = inputUrl.getText().toString();
+               // String videoId = extractVideoId(musicUrl);
+                //youTubePlayer.loadVideo(videoId,1);
+
+                Intent intent = new Intent(AddMusic.this,YoutubeAttach.class);
+                intent.putExtra("uid", uid);
+                intent.putExtra("is_staff", is_staff);
+                startActivity(intent);
             }
         });
 
@@ -169,6 +203,8 @@ public class AddMusic extends AppCompatActivity {
                                     Toast.LENGTH_LONG).show();
                             finish();
                             Intent intent = new Intent(getApplicationContext(), KaraSession.class);
+                            intent.putExtra("uid", uid);
+                            intent.putExtra("is_staff", is_staff);
                             startActivity(intent);
                         }
                     }

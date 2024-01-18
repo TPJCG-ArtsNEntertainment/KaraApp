@@ -148,6 +148,8 @@ public class KaraSession extends AppCompatActivity {
             {
             //Create an Intent here to load the second activity
                 Intent intent = new Intent(KaraSession.this, AddMusic.class);
+                intent.putExtra("uid", uid);
+                intent.putExtra("is_staff", is_staff);
                 startActivity(intent);
             }
         });
@@ -175,6 +177,8 @@ public class KaraSession extends AppCompatActivity {
             public void onClick(View v) {
                 System.out.println(selectedMusicId);
                 Intent intent = new Intent(getApplicationContext(), EditMusic.class);
+                intent.putExtra("uid", uid);
+                intent.putExtra("is_staff", is_staff);
                 intent.putExtra("mid", selectedMusicId);
                 startActivity(intent);
             }
@@ -297,7 +301,8 @@ public class KaraSession extends AppCompatActivity {
 
                                                 buttonLinearLayout.setVisibility(View.VISIBLE);
 
-                                                if(is_staffBoolean) {
+                                                if(is_staffBoolean)
+                                                {
                                                     btnEditMusic.setClickable(true);
                                                     btnEditMusic.setBackgroundColor(0xFF6200EE);
                                                     btnPlayedMusic.setClickable(true);

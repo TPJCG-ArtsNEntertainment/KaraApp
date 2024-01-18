@@ -140,6 +140,9 @@ public class EditMusic extends AppCompatActivity {
         btnEditSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                music_name=editTextMusic.getText().toString();
+                music_artist=editTextArtist.getText().toString();
+                music_url=editTextUrl.getText().toString();
                 Map<String, String> params_update = new HashMap<String, String>();
                 params_update.put("mid",mid);
                 params_update.put("music_name",music_name);
@@ -185,6 +188,8 @@ public class EditMusic extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Success in updating database", Toast.LENGTH_LONG).show();
                                 finish();
                                 Intent intent = new Intent(getApplicationContext(), KaraSession.class);
+                                intent.putExtra("uid", uid);
+                                intent.putExtra("is_staff", is_staff);
                                 startActivity(intent);
                             }
                         }
