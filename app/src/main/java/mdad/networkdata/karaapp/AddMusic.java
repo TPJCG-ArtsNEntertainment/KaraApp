@@ -41,7 +41,7 @@ import kotlin.jvm.functions.Function0;
 
 public class AddMusic extends AppCompatActivity {
     EditText inputMusic,inputArtist,inputUrl;
-    String musicName,musicArtist,musicUrl,uid,is_staff;
+    String attachUrl,attachName,attachArtist,musicName,musicArtist,musicUrl,uid,is_staff;
     Boolean is_staffBoolean;
     Button btnAttach,btnSubmit;
     YouTubePlayer youTubePlayer; // Declare youTubePlayer here
@@ -54,31 +54,22 @@ public class AddMusic extends AppCompatActivity {
         setContentView(R.layout.activity_add_music);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        inputMusic = (EditText) findViewById(R.id.inputMusic);
+        inputArtist = (EditText) findViewById(R.id.inputArtist);
+        inputUrl = (EditText) findViewById(R.id.inputUrl);
+
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
         is_staffBoolean = is_staff.equals("1");
 
-        Intent youtube = getIntent();
-        String currentUrl = intent.getStringExtra("currentUrl");
+        attachUrl = intent.getStringExtra("attachUrl");
+        attachName = intent.getStringExtra("attachName");
+        attachArtist = intent.getStringExtra("attachArtist");
 
-        EditText editText = (EditText) findViewById(R.id.inputUrl);
-        editText.setText(currentUrl);
-
-        if (inputUrl != null) {
-            musicUrl = inputUrl.getText().toString();
-            String videoId = extractVideoId(musicUrl);
-            youTubePlayer.loadVideo(videoId,1);
-        }
-
-
-
-
-
-
-
-
-
+        inputUrl.setText(attachUrl);
+        inputMusic.setText(attachName);
+        inputArtist.setText(attachArtist);
 
 //        YoutubePlayer Logic
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
@@ -133,8 +124,8 @@ public class AddMusic extends AppCompatActivity {
             public void onReady(YouTubePlayer youTubePlayer) {
                 AddMusic.this.youTubePlayer = youTubePlayer;
                 youTubePlayer.loadVideo("7L3Hdp86aio", 0f);
-                if (currentUrl != null) {
-                    String videoId = extractVideoId(currentUrl);
+                if (attachUrl != null) {
+                    String videoId = extractVideoId(attachUrl);
                     youTubePlayer.loadVideo(videoId,1);
                 }
             }
@@ -142,20 +133,10 @@ public class AddMusic extends AppCompatActivity {
         getLifecycle().addObserver(youTubePlayerView);
 //        End of Logic
 
-        inputMusic = (EditText) findViewById(R.id.inputMusic);
-        inputArtist = (EditText) findViewById(R.id.inputArtist);
-        inputUrl = (EditText) findViewById(R.id.inputUrl);
-
-
-
         btnAttach = (Button) findViewById(R.id.btnAttach);
         btnAttach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //musicUrl = inputUrl.getText().toString();
-               // String videoId = extractVideoId(musicUrl);
-                //youTubePlayer.loadVideo(videoId,1);
-
                 Intent intent = new Intent(AddMusic.this,YoutubeAttach.class);
                 intent.putExtra("uid", uid);
                 intent.putExtra("is_staff", is_staff);

@@ -4,18 +4,22 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 
-public class YoutubeAttach extends AppCompatActivity {
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-    String uid,is_staff;
+public class YoutubeAttach extends AppCompatActivity {
+    String uid,is_staff,attachName,attachArtist;
     Boolean is_staffBoolean;
     WebView webView;
     Button InsertLink;
@@ -41,40 +45,66 @@ public class YoutubeAttach extends AppCompatActivity {
                 return true;
             }
         });
+
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
         } else {
             webView.loadUrl("https://www.youtube.com/");
         }
 
-
-
-
-
-
         InsertLink = (Button) findViewById(R.id.btnInsertLink);
         InsertLink.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                String currentUrl = webView.getUrl();
-                Intent youtube = new Intent(YoutubeAttach.this,AddMusic.class);
-                youtube.putExtra("uid", uid);
-                youtube.putExtra("is_staff", is_staff);
-                youtube.putExtra("currentUrl", currentUrl);
+            public void onClick(View v) {
+                webView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        // Page has finished loading, now get the complete HTML
+                        view.evaluateJavascript("document.documentElement.outerHTML;", new ValueCallback<String>() {
+                            @Override
+                            public void onReceiveValue(String html) {
+                                // Log or process the complete HTML
+                                Log.d("WebView", html);
+                            }
+                        });
+                    }
+                });
+                webView.evaluateJavascript(
+                        "(function() {" +
+                                "   var scriptTag = document.querySelector('script[type=\"application/ld+json\"]');" +
+                                "   if (scriptTag) {" +
+                                "       var jsonContent = JSON.parse(scriptTag.textContent);" +
+                                "       return jsonContent.name + '|||' + jsonContent.author;" +
+                                "   } else {" +
+                                "       return null;" +
+                                "   }" +
+                                "})();",
+                        new ValueCallback<String>() {
+                            @Override
+                            public void onReceiveValue(String result) {
+                                if (result != null) {
+                                    String[] values = result.split("\\|\\|\\|");
+                                    if (values.length == 2) {
+                                        attachName = values[0].substring(1);;
+                                        attachArtist = values[1].substring(0, values[1].length() - 1);;
+                                    }
 
-                startActivity(youtube);
+                                    // Handle the title as needed, for example, pass it to another activity
+                                    Intent youtube = new Intent(YoutubeAttach.this, AddMusic.class);
+                                    youtube.putExtra("uid", uid);
+                                    youtube.putExtra("is_staff", is_staff);
+                                    youtube.putExtra("attachUrl", webView.getUrl());
+                                    youtube.putExtra("attachName", attachName);
+                                    youtube.putExtra("attachArtist", attachArtist);
+                                    startActivity(youtube);
+                                } else {
+                                    Log.e("Title", "Title element not found in the HTML");
+                                }
+                            }
+                        });
             }
         });
     }
-
-
-
-
-
-
-
-
 
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -86,6 +116,20 @@ public class YoutubeAttach extends AppCompatActivity {
         webView.restoreState(savedInstanceState);
     }
 
+    public String extractVideoId(String url) {
+        String videoId = "";
+        try {
+            // Regular expression pattern to match YouTube video IDs
+            Pattern pattern = Pattern.compile("^.*(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|&v=)([^#&?]*).*");
+            Matcher matcher = pattern.matcher(url);
+            if (matcher.matches() && matcher.group(2).length() == 11) {
+                videoId = matcher.group(2);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return videoId;
+    }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the option menu and display the option items when clicked;
