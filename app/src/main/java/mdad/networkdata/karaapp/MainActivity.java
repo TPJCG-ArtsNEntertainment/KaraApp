@@ -10,15 +10,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MainActivity extends AppCompatActivity {
-    public static String ipBaseAddress = "http://aetpjcgkara.atspace.cc/";
+    private String uid,is_staff;
+    private Boolean is_staffBoolean;
     public static ViewPager2 viewPager;
-    public String uid, username, is_staff;
-    public boolean is_staffBoolean;
+    public static String ipBaseAddress = "http://aetpjcgkara.atspace.cc/";
     private FragmentStateAdapter pagerAdapter;
     private String[] titles = new String[]{"Session", "History", "Player", "Lyrics"};
     private static final int NUM_PAGES = 4;
@@ -31,10 +32,9 @@ public class MainActivity extends AppCompatActivity {
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
         is_staffBoolean = is_staff.equals("1");
-        username = intent.getStringExtra("username");
 
-        viewPager = findViewById(R.id.myPager);
-        TabLayout tabLayout =( TabLayout) findViewById(R.id.tabLayout);
+        viewPager = findViewById(R.id.mypager);
+        TabLayout tabLayout =( TabLayout) findViewById(R.id.tab_layout);
         pagerAdapter = new MyPagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
         TabLayoutMediator tlm = new TabLayoutMediator(tabLayout,viewPager,(tab, position) ->
@@ -52,13 +52,10 @@ public class MainActivity extends AppCompatActivity {
                     return Session.newInstance("session",null);
                 }
 //                case 1: {
-//                    return History.newInstance("history", null);
+//                    return SecondFragment.newInstance("fragment 2", null);
 //                }
 //                case 2: {
-//                    return Player.newInstance("player", null);
-//                }
-//                case 3: {
-//                    return Lyrics.newInstance("lyrics", null);
+//                    return ThirdFragment.newInstance("fragment 3", null);
 //                }
                 default:
                     return new Fragment();
@@ -69,11 +66,12 @@ public class MainActivity extends AppCompatActivity {
             return NUM_PAGES;
         }
     }
+
     @Override
     //add the option menu to the activity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the option menu and display the option items when clicked;
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_action_bar, menu);
         String className = getClass().getSimpleName();
         String[] words = className.split("(?=[A-Z])");
         className = String.join(" ", words).trim();
@@ -94,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
         int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {MainActivity.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {
@@ -113,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, cls);
         intent.putExtra("uid", uid);
         intent.putExtra("is_staff", is_staff);
-        intent.putExtra("username", username);
         startActivity(intent);
     }
 }
