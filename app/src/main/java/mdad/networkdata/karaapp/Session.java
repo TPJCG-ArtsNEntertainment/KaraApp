@@ -1,22 +1,25 @@
 package mdad.networkdata.karaapp;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
-import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -34,6 +37,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.tabs.TabLayout;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.FullscreenListener;
@@ -50,36 +54,59 @@ import java.util.regex.Pattern;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
-public class KaraSession extends AppCompatActivity {
-    Button btnAddMusic, btnEditMusic, btnPlayedMusic, btnRemoveMusic, btnPower;
-    YouTubePlayer youTubePlayer;
-    ListView listView;
-    LinearLayout buttonLinearLayout;
-    ImageView closedSessionImage;
-    TextView closedSessionLabel;
-    ArrayList<HashMap<String, String>> musicsList;
-    private boolean isFullscreen = false, is_staffBoolean, power;
-    private int selectedPosition = -1;
-    private String selectedMusicId, selectedMusicName, selectedMusicArtist, selectedMusicUrl, uid, is_staff;
-    private final int get_all_queue_music = 1, update_delete_music =2, get_power=3, update_power=4;
-    // url to get all products list via the php file get_all_productsJson.php
-    public static String ipBaseAddress = "http://aetpjcgkara.atspace.cc/";
-    private static String url_all_queue_musics = KaraSession.ipBaseAddress+"get_all_musicQueueVolley.php";
-    private static String url_update_musio = KaraSession.ipBaseAddress+"update_musicVolley.php";
-    private static String url_delete_music = KaraSession.ipBaseAddress+"delete_musicVolley.php";
-    private static String url_get_power = KaraSession.ipBaseAddress+"get_powerVolley.php";
-    private static String url_update_power = KaraSession.ipBaseAddress+"update_powerVolley.php";
+public class Session extends Fragment {
+    private static final String ARG_PARAM1 = "param1",ARG_PARAM2 = "param2";
+    private String mParam1, mParam2;
+    public Session(){};
+    public static Session newInstance(String param1, String param2) {
+        Session session = new Session();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        session.setArguments(args);
+        return session;
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_kara_session);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.activity_session, container, false);
+    }
+
+    private static String url_all_queue_musics = MainActivity.ipBaseAddress+"get_all_musicQueueVolley.php";
+    private static String url_update_music = MainActivity.ipBaseAddress+"update_musicVolley.php";
+    private static String url_delete_music = MainActivity.ipBaseAddress+"delete_musicVolley.php";
+    private static String url_get_power = MainActivity.ipBaseAddress+"get_powerVolley.php";
+    private static String url_update_power = MainActivity.ipBaseAddress+"update_powerVolley.php";
+    private Button btnAddMusic, btnEditMusic, btnPlayedMusic, btnRemoveMusic, btnPower;
+    private YouTubePlayer youTubePlayer;
+    private ListView listView;
+    private LinearLayout buttonLinearLayout;
+    private ImageView closedSessionImage;
+    private TextView closedSessionLabel;
+    private ArrayList<HashMap<String, String>> musicsList;
+    private boolean isFullscreen = false, power;
+    private int selectedPosition = -1;
+    private String selectedMusicId, selectedMusicName, selectedMusicArtist, selectedMusicUrl;
+    private final int get_all_queue_music = 1, update_delete_music =2, get_power=3, update_power=4;
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
 
 //        YoutubePlayer Logic
-        getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
-        YouTubePlayerView youTubePlayerView = findViewById(R.id.mainPageYoutubePlayer);
-        LinearLayout linearLayout = findViewById(R.id.mainPageLinearLayout);
-        FrameLayout fullscreenViewContainer = findViewById(R.id.mainPageFullScreenViewContainer);
+        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), onBackPressedCallback);
+        YouTubePlayerView youTubePlayerView = view.findViewById(R.id.mainPageYoutubePlayer);
+        LinearLayout linearLayout = view.findViewById(R.id.mainPageLinearLayout);
+        FrameLayout fullscreenViewContainer = view.findViewById(R.id.mainPageFullScreenViewContainer);
+        TabLayout tabLayout = requireActivity().findViewById(R.id.tabLayout);
         IFramePlayerOptions iFramePlayerOptions = new IFramePlayerOptions.Builder()
                 .controls(1)
                 .fullscreen(1)
@@ -91,14 +118,15 @@ public class KaraSession extends AppCompatActivity {
                 isFullscreen = true;
                 youTubePlayerView.setVisibility(View.GONE);
                 linearLayout.setVisibility(View.GONE);
+                tabLayout.setVisibility(View.GONE);
                 fullscreenViewContainer.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.addView(fullscreenView);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Window window = KaraSession.this.getWindow();
+                    Window window = requireActivity().getWindow();
                     window.setDecorFitsSystemWindows(false);
-                    window.setNavigationBarColor(KaraSession.this.getResources().getColor(android.R.color.black));
+                    window.setNavigationBarColor(Session.this.getResources().getColor(android.R.color.black));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) KaraSession.this).getSupportActionBar();
+                    ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.hide();
                     }
@@ -109,14 +137,15 @@ public class KaraSession extends AppCompatActivity {
                 isFullscreen = false;
                 youTubePlayerView.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
+                tabLayout.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.setVisibility(View.GONE);
                 fullscreenViewContainer.removeAllViews();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Window window = KaraSession.this.getWindow();
+                    Window window = requireActivity().getWindow();
                     window.setDecorFitsSystemWindows(true);
-                    window.setNavigationBarColor(KaraSession.this.getResources().getColor(android.R.color.transparent));
+                    window.setNavigationBarColor(Session.this.getResources().getColor(android.R.color.transparent));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) KaraSession.this).getSupportActionBar();
+                    ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.show();
                     }
@@ -126,7 +155,7 @@ public class KaraSession extends AppCompatActivity {
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(YouTubePlayer youTubePlayer) {
-                KaraSession.this.youTubePlayer = youTubePlayer;
+                Session.this.youTubePlayer = youTubePlayer;
                 youTubePlayer.loadVideo("7L3Hdp86aio", 0f);
             }
         }, iFramePlayerOptions);
@@ -134,22 +163,30 @@ public class KaraSession extends AppCompatActivity {
 //        End of Logic
 
         // get resource id of ListView
-        listView = (ListView)findViewById(R.id.listViewQueue);
+        listView = (ListView)view.findViewById(R.id.listViewQueue);
+        registerForContextMenu(listView);
         // ArrayList to store product info in Hashmap for ListView
         musicsList = new ArrayList<HashMap<String, String>>();
         // re-usable method to use Volley to retrieve products from database
         postData(url_all_queue_musics, null, get_all_queue_music);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedMusicId = ((TextView) view.findViewById(R.id.mid)).getText().toString();
+            }
+        });
 
-        btnAddMusic = (Button) findViewById(R.id.btnQueueAdd);
+        btnAddMusic = (Button) view.findViewById(R.id.btnQueueAdd);
         btnAddMusic.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
             //Create an Intent here to load the second activity
-                Intent intent = new Intent(KaraSession.this, AddMusic.class);
-                intent.putExtra("uid", uid);
-                intent.putExtra("is_staff", is_staff);
+                Intent intent = new Intent(requireActivity(), AddMusic.class);
+                intent.putExtra("uid", ((MainActivity) getActivity()).uid);
+                intent.putExtra("is_staff", ((MainActivity) getActivity()).is_staff);
+                intent.putExtra("username", ((MainActivity) getActivity()).username);
                 startActivity(intent);
             }
         });
@@ -157,9 +194,9 @@ public class KaraSession extends AppCompatActivity {
 //        Kara Session Power Logic
 
         postData(url_get_power,null, get_power);
-        closedSessionImage = (ImageView) findViewById(R.id.closedSessionImage);
-        closedSessionLabel = (TextView) findViewById(R.id.closedSessionLabel);
-        btnPower = (Button) findViewById(R.id.btnPower);
+        closedSessionImage = (ImageView) view.findViewById(R.id.closedSessionImage);
+        closedSessionLabel = (TextView) view.findViewById(R.id.closedSessionLabel);
+        btnPower = (Button) view.findViewById(R.id.btnPower);
         btnPower.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -171,70 +208,100 @@ public class KaraSession extends AppCompatActivity {
             }
         });
 
-        btnEditMusic = (Button) findViewById(R.id.btnQueueEdit);
-        btnEditMusic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println(selectedMusicId);
-                Intent intent = new Intent(getApplicationContext(), EditMusic.class);
-                intent.putExtra("uid", uid);
-                intent.putExtra("is_staff", is_staff);
-                intent.putExtra("mid", selectedMusicId);
-                startActivity(intent);
-            }
-        });
-
-        btnPlayedMusic = (Button) findViewById(R.id.btnSetPlayed);
-        btnPlayedMusic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Map<String, String> params_update = new HashMap<String, String>();
-                params_update.put("mid", selectedMusicId);
-                params_update.put("music_name", selectedMusicName);
-                params_update.put("artist_name", selectedMusicArtist);
-                params_update.put("url", selectedMusicUrl);
-                params_update.put("is_played", "1");
-                postData(url_update_musio, params_update, update_delete_music);
-            }
-        });
-
-        btnRemoveMusic = (Button) findViewById(R.id.btnQueueRemove);
-        btnRemoveMusic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Map<String, String> params_update = new HashMap<String, String>();
-                params_update.put("mid", selectedMusicId);
-                postData(url_delete_music, params_update, update_delete_music);
-            }
-        });
-        buttonLinearLayout = findViewById(R.id.mainPageButtonLinearLayout);
+//        btnEditMusic = (Button) view.findViewById(R.id.btnQueueEdit);
+//        btnEditMusic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                System.out.println(selectedMusicId);
+//                Intent intent = new Intent(requireActivity(), EditMusic.class);
+//                intent.putExtra("uid", ((MainActivity) getActivity()).uid);
+//                intent.putExtra("is_staff", ((MainActivity) getActivity()).is_staff);
+//                intent.putExtra("username", ((MainActivity) getActivity()).username);
+//                intent.putExtra("mid", selectedMusicId);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        btnPlayedMusic = (Button) view.findViewById(R.id.btnSetPlayed);
+//        btnPlayedMusic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Map<String, String> params_update = new HashMap<String, String>();
+//                params_update.put("mid", selectedMusicId);
+//                params_update.put("music_name", selectedMusicName);
+//                params_update.put("artist_name", selectedMusicArtist);
+//                params_update.put("url", selectedMusicUrl);
+//                params_update.put("is_played", "1");
+//                postData(url_update_musio, params_update, update_delete_music);
+//            }
+//        });
+//
+//        btnRemoveMusic = (Button) view.findViewById(R.id.btnQueueRemove);
+//        btnRemoveMusic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Map<String, String> params_update = new HashMap<String, String>();
+//                params_update.put("mid", selectedMusicId);
+//                postData(url_delete_music, params_update, update_delete_music);
+//            }
+//        });
+//        buttonLinearLayout = view.findViewById(R.id.mainPageButtonLinearLayout);
 
 //        Check Staff
-        Intent intent = getIntent();
-        uid = intent.getStringExtra("uid");
-        is_staff = intent.getStringExtra("is_staff");
-        is_staffBoolean = is_staff.equals("1");
-        if(!is_staffBoolean){
-            buttonLinearLayout.setVisibility(View.GONE);
-            btnPower.setVisibility(View.GONE);
-        }else if(is_staffBoolean){
-            buttonLinearLayout.setVisibility(View.VISIBLE);
-            btnPower.setVisibility(View.VISIBLE);
+//        if(!((MainActivity) getActivity()).is_staffBoolean){
+//            buttonLinearLayout.setVisibility(View.GONE);
+//            btnPower.setVisibility(View.GONE);
+//        }else if(((MainActivity) getActivity()).is_staffBoolean){
+//            buttonLinearLayout.setVisibility(View.VISIBLE);
+//            btnPower.setVisibility(View.VISIBLE);
+//        }
+//        if(selectedMusicId == null){
+//            btnEditMusic.setClickable(false);
+//            btnEditMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+//            btnPlayedMusic.setClickable(false);
+//            btnPlayedMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+//            btnRemoveMusic.setClickable(false);
+//            btnRemoveMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+//        }
+    }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        requireActivity().getMenuInflater().inflate(R.menu.menu_music, menu);
+    }
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        HashMap<String, String> rowData = musicsList.get(info.position);
+        int itemId = item.getItemId();
+        if (itemId == R.id.option_play) {
+                selectedMusicName = rowData.get("music_name");
+                selectedMusicUrl = rowData.get("url");
+                String videoId = extractVideoId(selectedMusicUrl);
+                youTubePlayer.loadVideo(videoId,1);
+                Toast.makeText(requireActivity(), "Playing: " + selectedMusicName, Toast.LENGTH_SHORT).show();
+        } else if (itemId == R.id.option_set_played) {
+            // Handle action
+            // You can use info.position to get the position of the selected item
+        } else if (itemId == R.id.option_set_unplayed) {
+            // Handle action
+            // You can use info.position to get the position of the selected item
+        } else if (itemId == R.id.option_edit) {
+            // Handle action
+            // You can use info.position to get the position of the selected item
+        } else if (itemId == R.id.option_remove) {
+            // Handle action
+            // You can use info.position to get the position of the selected item
+        } else {
+            return super.onContextItemSelected(item);
+//            return false;
         }
-        if(selectedMusicId == null){
-            btnEditMusic.setClickable(false);
-            btnEditMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-            btnPlayedMusic.setClickable(false);
-            btnPlayedMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-            btnRemoveMusic.setClickable(false);
-            btnRemoveMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-        }
+        return true;
     }
 
     public void postData(String url, Map params, final int requestType) {
-        Context context = this;
         //create a RequestQueue for Volley
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        RequestQueue requestQueue = Volley.newRequestQueue(requireActivity());
         //create a StringRequest for Volley for HTTP Post
         StringRequest stringRequest = new StringRequest( Request.Method.POST, url,
                 //response from server
@@ -244,7 +311,7 @@ public class KaraSession extends AppCompatActivity {
                         if (requestType == get_all_queue_music) {
                             //check if error code received from server.
                             if (response.equals("Error")) {
-                                Toast.makeText(getApplicationContext(), "Error in retrieving database", Toast.LENGTH_LONG).show();
+                                Toast.makeText(requireActivity(), "Error in retrieving database", Toast.LENGTH_LONG).show();
                                 return;
                             }
                             //handle the response data received from server
@@ -276,7 +343,7 @@ public class KaraSession extends AppCompatActivity {
                             }
                             //populate the listview with product information from Hashmap
                             ListAdapter adapter = new SimpleAdapter(
-                                            KaraSession.this, musicsList,
+                                            requireActivity(), musicsList,
                                             R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"}, new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
                                     ){
                                     @Override
@@ -287,34 +354,34 @@ public class KaraSession extends AppCompatActivity {
                                         String videoId = extractVideoId(rowData.get("url"));
                                         String imageUrl = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
                                         Picasso.get().load(imageUrl).into(youtubePreviewImage);
-                                        Button btnSelect = view.findViewById(R.id.btnSelect);
-                                        btnSelect.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                selectedMusicId = rowData.get("music_id");
-                                                selectedMusicName = rowData.get("music_name");
-                                                selectedMusicArtist = rowData.get("artist_name");
-                                                selectedMusicUrl = rowData.get("url");
-                                                String videoId = extractVideoId(selectedMusicUrl);
-                                                youTubePlayer.loadVideo(videoId,1);
-                                                Toast.makeText(getApplicationContext(), "Playing: " + selectedMusicName, Toast.LENGTH_SHORT).show();
-
-                                                buttonLinearLayout.setVisibility(View.VISIBLE);
-
-                                                if(is_staffBoolean)
-                                                {
-                                                    btnEditMusic.setClickable(true);
-                                                    btnEditMusic.setBackgroundColor(0xFF6200EE);
-                                                    btnPlayedMusic.setClickable(true);
-                                                    btnPlayedMusic.setBackgroundColor(0xFF6200EE);
-                                                    btnRemoveMusic.setClickable(true);
-                                                    btnRemoveMusic.setBackgroundColor(0xFF6200EE);
-                                                }
-
-                                                selectedPosition = position;
-                                                notifyDataSetChanged();
-                                            }
-                                        });
+//                                        Button btnSelect = view.findViewById(R.id.btnSelect);
+//                                        btnSelect.setOnClickListener(new View.OnClickListener() {
+//                                            @Override
+//                                            public void onClick(View v) {
+//                                                selectedMusicId = rowData.get("music_id");
+//                                                selectedMusicName = rowData.get("music_name");
+//                                                selectedMusicArtist = rowData.get("artist_name");
+//                                                selectedMusicUrl = rowData.get("url");
+//                                                String videoId = extractVideoId(selectedMusicUrl);
+//                                                youTubePlayer.loadVideo(videoId,1);
+//                                                Toast.makeText(requireActivity(), "Playing: " + selectedMusicName, Toast.LENGTH_SHORT).show();
+//
+//                                                buttonLinearLayout.setVisibility(View.VISIBLE);
+//
+//                                                if(((MainActivity) getActivity()).is_staffBoolean)
+//                                                {
+//                                                    btnEditMusic.setClickable(true);
+//                                                    btnEditMusic.setBackgroundColor(0xFF6200EE);
+//                                                    btnPlayedMusic.setClickable(true);
+//                                                    btnPlayedMusic.setBackgroundColor(0xFF6200EE);
+//                                                    btnRemoveMusic.setClickable(true);
+//                                                    btnRemoveMusic.setBackgroundColor(0xFF6200EE);
+//                                                }
+//
+//                                                selectedPosition = position;
+//                                                notifyDataSetChanged();
+//                                            }
+//                                        });
                                         if (position == selectedPosition) {
                                             view.setBackgroundColor(Color.YELLOW);
                                         } else {
@@ -329,10 +396,10 @@ public class KaraSession extends AppCompatActivity {
                         if (requestType == update_delete_music) {
                             System.out.println(response);
                             if (response.trim().equals("Error")) {
-                                Toast.makeText(getApplicationContext(), "Error in updating database", Toast.LENGTH_LONG).show();
+                                Toast.makeText(requireActivity(), "Error in updating database", Toast.LENGTH_LONG).show();
                             }
                             if (response.trim().equals("Success")) {
-                                Toast.makeText(getApplicationContext(), "Success in updating database", Toast.LENGTH_LONG).show();
+                                Toast.makeText(requireActivity(), "Success in updating database", Toast.LENGTH_LONG).show();
                                 for (int i = 0; i < musicsList.size(); i++) {
                                     HashMap<String, String> map = musicsList.get(i);
                                     String musicId = map.get("music_id");
@@ -343,18 +410,18 @@ public class KaraSession extends AppCompatActivity {
 
                                 }
                                 selectedPosition = -1;
-                                btnEditMusic.setClickable(false);
-                                btnEditMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                                btnPlayedMusic.setClickable(false);
-                                btnPlayedMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                                btnRemoveMusic.setClickable(false);
-                                btnRemoveMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+//                                btnEditMusic.setClickable(false);
+//                                btnEditMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+//                                btnPlayedMusic.setClickable(false);
+//                                btnPlayedMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+//                                btnRemoveMusic.setClickable(false);
+//                                btnRemoveMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                                 ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
                             }
                         }
                         if (requestType == get_power){
                             if (response.equals(" Error")) {
-                                Toast.makeText(getApplicationContext(), "Error in retrieving database", Toast.LENGTH_LONG).show();
+                                Toast.makeText(requireActivity(), "Error in retrieving database", Toast.LENGTH_LONG).show();
                             }
                             power = response.equals("1");
                             if (!power){
@@ -362,9 +429,8 @@ public class KaraSession extends AppCompatActivity {
                                 closedSessionLabel.setVisibility(View.GONE);
                                 listView.setVisibility(View.VISIBLE);
                                 btnAddMusic.setClickable(true);
-//                                btnAddMusic.setBackgroundColor(0xFF6200EE);
                                 btnAddMusic.setBackgroundColor(0xFF6200EE);
-                                btnPower.setText("Off");
+//                                btnPower.setText("Off");
                                 btnPower.setBackgroundColor(0xFFFF0000);
                             }
                             if (power) {
@@ -373,16 +439,16 @@ public class KaraSession extends AppCompatActivity {
                                 closedSessionLabel.setVisibility(View.VISIBLE);
                                 btnAddMusic.setClickable(false);
                                 btnAddMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                                btnPower.setText("On");
+//                                btnPower.setText("On");
                                 btnPower.setBackgroundColor(0xFF4CAF50);
                             }
                         }
                         if (requestType == update_power){
                             if (response.equals("Error")) {
-                                Toast.makeText(getApplicationContext(), "Error in updating database", Toast.LENGTH_LONG).show();
+                                Toast.makeText(requireActivity(), "Error in updating database", Toast.LENGTH_LONG).show();
                             }
                             if (response.equals("Success")) {
-                                Toast.makeText(getApplicationContext(), "Success in updating database", Toast.LENGTH_LONG).show();
+                                Toast.makeText(requireActivity(), "Success in updating database", Toast.LENGTH_LONG).show();
                                 postData(url_get_power,null,get_power);
                             }
                         }
@@ -393,7 +459,7 @@ public class KaraSession extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                     // handle error
-                        Toast.makeText(getApplicationContext(),"Error in retrieving database",Toast.LENGTH_LONG).show();
+                        Toast.makeText(requireActivity(),"Error in retrieving database",Toast.LENGTH_LONG).show();
                     }
                 }
         ){
@@ -427,56 +493,7 @@ public class KaraSession extends AppCompatActivity {
         public void handleOnBackPressed() {
             if (isFullscreen) {
                 youTubePlayer.toggleFullscreen();
-            } else {
-                finish();
             }
         }
     };
-
-    @Override
-    //add the option menu to the activity
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the option menu and display the option items when clicked;
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        String className = getClass().getSimpleName();
-        String[] words = className.split("(?=[A-Z])");
-        className = String.join(" ", words).trim();
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item.getTitle().toString().equals(className)) {
-                item.setVisible(false);
-            }
-        }
-        if (!is_staffBoolean) {
-            menu.findItem(R.id.item5).setVisible(false);
-        }
-        return true;
-    }
-    @Override
-    //when the option item is selected
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        // Array of menu items with their corresponding destination classes
-        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {KaraSession.class, KaraHistory.class, MusicPlayer.class, MusicLyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
-        // Iterate over menu items and check conditions
-        for (int i = 0; i < menuItems.length; i++) {
-            if (id == menuItems[i]) {
-                // Start the activity for the selected menu item
-                startActivityIntent(destinationClasses[i]);
-                return true;
-            } else if (id == android.R.id.home) {
-                onBackPressed();
-                return true;
-            }
-        }
-        // If the selected item is not found in the loop, fallback to super.onOptionsItemSelected
-        return super.onOptionsItemSelected(item);
-    }
-    private void startActivityIntent(Class<?> cls) {
-        Intent intent = new Intent(KaraSession.this, cls);
-        intent.putExtra("uid", uid);
-        intent.putExtra("is_staff", is_staff);
-        startActivity(intent);
-    }
 }

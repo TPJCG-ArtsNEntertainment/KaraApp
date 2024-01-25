@@ -23,7 +23,7 @@ import java.util.Map;
 public class Login extends AppCompatActivity {
     EditText inputEmail, inputPassword;
     Button btnLogin, btnRegister;
-    private static String url_verify_user = KaraSession.ipBaseAddress+"verify_userVolley.php";
+    private static String url_verify_user = MainActivity.ipBaseAddress+"verify_userVolley.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,17 +77,19 @@ public class Login extends AppCompatActivity {
                         String name = details[3];
                         String is_staff = details[4];
 
+                        finish();
+                        Intent intent = new Intent(Login.this, MainActivity.class);
+                        intent.putExtra("uid", uid);
+                        intent.putExtra("is_staff", is_staff);
                         if (name == null){
                             Toast.makeText(getApplicationContext(), "Logging in to "+email,
                                     Toast.LENGTH_LONG).show();
+                            intent.putExtra("username", email);
                         } else {
                             Toast.makeText(getApplicationContext(), "Logging in to "+name,
                                     Toast.LENGTH_LONG).show();
+                            intent.putExtra("username", name);
                         }
-                        finish();
-                        Intent intent = new Intent(Login.this, KaraSession.class);
-                        intent.putExtra("uid", uid);
-                        intent.putExtra("is_staff", is_staff);
                         startActivity(intent);
                     }
                 }, new Response.ErrorListener() {

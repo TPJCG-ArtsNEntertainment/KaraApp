@@ -10,7 +10,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class MusicLyrics extends AppCompatActivity {
+public class Lyrics extends AppCompatActivity {
     String uid,is_staff;
     Boolean is_staffBoolean;
     WebView webView;
@@ -18,7 +18,7 @@ public class MusicLyrics extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_music_lyrics);
+        setContentView(R.layout.activity_lyrics);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
@@ -78,7 +78,7 @@ public class MusicLyrics extends AppCompatActivity {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
         int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {KaraSession.class, KaraHistory.class, MusicPlayer.class, MusicLyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {
@@ -94,7 +94,7 @@ public class MusicLyrics extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private void startActivityIntent(Class<?> cls) {
-        Intent intent = new Intent(MusicLyrics.this, cls);
+        Intent intent = new Intent(Lyrics.this, cls);
         intent.putExtra("uid", uid);
         intent.putExtra("is_staff", is_staff);
         startActivity(intent);

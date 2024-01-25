@@ -45,8 +45,8 @@ public class EditMusic extends AppCompatActivity {
     YouTubePlayer youTubePlayer;
     private boolean isFullscreen = false, is_staffBoolean;
     private final int get_music_details = 1, update_music = 2;
-    private static final String url_music_details = KaraSession.ipBaseAddress+"get_music_detailsVolley.php";
-    private static final String url_update_product = KaraSession.ipBaseAddress+"update_musicVolley.php";
+    private static final String url_music_details = MainActivity.ipBaseAddress+"get_music_detailsVolley.php";
+    private static final String url_update_product = MainActivity.ipBaseAddress+"update_musicVolley.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,7 +187,7 @@ public class EditMusic extends AppCompatActivity {
                             if (response.trim().equals("Success")) {
                                 Toast.makeText(getApplicationContext(), "Success in updating database", Toast.LENGTH_LONG).show();
                                 finish();
-                                Intent intent = new Intent(getApplicationContext(), KaraSession.class);
+                                Intent intent = new Intent(getApplicationContext(), Session.class);
                                 intent.putExtra("uid", uid);
                                 intent.putExtra("is_staff", is_staff);
                                 startActivity(intent);
@@ -261,7 +261,7 @@ public class EditMusic extends AppCompatActivity {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
         int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {KaraSession.class, KaraHistory.class, MusicPlayer.class, MusicLyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {

@@ -14,8 +14,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -48,8 +46,10 @@ import java.util.regex.Pattern;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
-public class KaraHistory extends AppCompatActivity {
-
+public class History extends AppCompatActivity {
+    private static String url_all_queue_musics = MainActivity.ipBaseAddress+"get_all_musicHistoryVolley.php";
+    private static String url_update_music = MainActivity.ipBaseAddress+"update_musicVolley.php";
+    private static String url_delete_music = MainActivity.ipBaseAddress+"delete_musicVolley.php";
     Button HisbtnEditMusic, HisbtnPlayedMusic, HisbtnRemoveMusic;
     ListView HislistView;
     YouTubePlayer HisyouTubePlayer;
@@ -59,19 +59,13 @@ public class KaraHistory extends AppCompatActivity {
     private int selectedPosition = -1;
     private String HisselectedMusicId, HisselectedMusicName, HisselectedMusicArtist, HisselectedMusicUrl;
     private final int get_all_queue_music = 1, update_delete_music =2, get_power=3, update_power=4;
-    // url to get all products list via the php file get_all_productsJson.php
-    public static String ipBaseAddress = "http://aetpjcgkara.atspace.cc/";
-    private static String url_all_queue_musics = KaraHistory.ipBaseAddress+"get_all_musicHistoryVolley.php";
-    private static String url_update_music = KaraHistory.ipBaseAddress+"update_musicVolley.php";
-    private static String url_delete_music = KaraHistory.ipBaseAddress+"delete_musicVolley.php";
-    private static String url_get_power = KaraHistory.ipBaseAddress+"get_powerVolley.php";
-    private static String url_update_power = KaraHistory.ipBaseAddress+"update_powerVolley.php";
+
     String uid,is_staff;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_kara_history);
+        setContentView(R.layout.activity_history);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -95,11 +89,11 @@ public class KaraHistory extends AppCompatActivity {
                 fullscreenViewContainer.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.addView(fullscreenView);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Window window = KaraHistory.this.getWindow();
+                    Window window = History.this.getWindow();
                     window.setDecorFitsSystemWindows(false);
-                    window.setNavigationBarColor(KaraHistory.this.getResources().getColor(android.R.color.black));
+                    window.setNavigationBarColor(History.this.getResources().getColor(android.R.color.black));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) KaraHistory.this).getSupportActionBar();
+                    ActionBar actionBar = ((AppCompatActivity) History.this).getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.hide();
                     }
@@ -114,11 +108,11 @@ public class KaraHistory extends AppCompatActivity {
                 fullscreenViewContainer.setVisibility(View.GONE);
                 fullscreenViewContainer.removeAllViews();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Window window = KaraHistory.this.getWindow();
+                    Window window = History.this.getWindow();
                     window.setDecorFitsSystemWindows(true);
-                    window.setNavigationBarColor(KaraHistory.this.getResources().getColor(android.R.color.transparent));
+                    window.setNavigationBarColor(History.this.getResources().getColor(android.R.color.transparent));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) KaraHistory.this).getSupportActionBar();
+                    ActionBar actionBar = ((AppCompatActivity) History.this).getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.show();
                     }
@@ -128,7 +122,7 @@ public class KaraHistory extends AppCompatActivity {
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(YouTubePlayer youTubePlayer) {
-                KaraHistory.this.HisyouTubePlayer = youTubePlayer;
+                History.this.HisyouTubePlayer = youTubePlayer;
                 youTubePlayer.loadVideo("7L3Hdp86aio", 0f);
             }
         }, iFramePlayerOptions);
@@ -209,8 +203,6 @@ public class KaraHistory extends AppCompatActivity {
             HisbtnPlayedMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
             HisbtnRemoveMusic.setClickable(false);
             HisbtnRemoveMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-
-
         }
     }
 
@@ -260,7 +252,7 @@ public class KaraHistory extends AppCompatActivity {
                             }
                             //populate the listview with product information from Hashmap
                             ListAdapter adapter = new SimpleAdapter(
-                                    KaraHistory.this, musicsList,
+                                    History.this, musicsList,
                                     R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"}, new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
                             ){
                                 @Override
@@ -271,31 +263,31 @@ public class KaraHistory extends AppCompatActivity {
                                     String videoId = extractVideoId(rowData.get("url"));
                                     String imageUrl = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
                                     Picasso.get().load(imageUrl).into(youtubePreviewImage);
-                                    Button btnSelect = view.findViewById(R.id.btnSelect);
-                                    btnSelect.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            HisselectedMusicId = rowData.get("music_id");
-                                            HisselectedMusicName = rowData.get("music_name");
-                                            HisselectedMusicArtist = rowData.get("artist_name");
-                                            HisselectedMusicUrl = rowData.get("url");
-                                            String videoId = extractVideoId(HisselectedMusicUrl);
-                                            HisyouTubePlayer.loadVideo(videoId,1);
-                                            Toast.makeText(getApplicationContext(), "Playing: " + HisselectedMusicName, Toast.LENGTH_SHORT).show();
-
-                                            HisbuttonLinearLayout.setVisibility(View.VISIBLE);
-
-                                            HisbtnEditMusic.setClickable(true);
-                                            HisbtnEditMusic.setBackgroundColor(0xFF6200EE);
-                                            HisbtnPlayedMusic.setClickable(true);
-                                            HisbtnPlayedMusic.setBackgroundColor(0xFF6200EE);
-                                            HisbtnRemoveMusic.setClickable(true);
-                                            HisbtnRemoveMusic.setBackgroundColor(0xFF6200EE);
-
-                                            selectedPosition = position;
-                                            notifyDataSetChanged();
-                                        }
-                                    });
+//                                    Button btnSelect = view.findViewById(R.id.btnSelect);
+//                                    btnSelect.setOnClickListener(new View.OnClickListener() {
+//                                        @Override
+//                                        public void onClick(View v) {
+//                                            HisselectedMusicId = rowData.get("music_id");
+//                                            HisselectedMusicName = rowData.get("music_name");
+//                                            HisselectedMusicArtist = rowData.get("artist_name");
+//                                            HisselectedMusicUrl = rowData.get("url");
+//                                            String videoId = extractVideoId(HisselectedMusicUrl);
+//                                            HisyouTubePlayer.loadVideo(videoId,1);
+//                                            Toast.makeText(getApplicationContext(), "Playing: " + HisselectedMusicName, Toast.LENGTH_SHORT).show();
+//
+//                                            HisbuttonLinearLayout.setVisibility(View.VISIBLE);
+//
+//                                            HisbtnEditMusic.setClickable(true);
+//                                            HisbtnEditMusic.setBackgroundColor(0xFF6200EE);
+//                                            HisbtnPlayedMusic.setClickable(true);
+//                                            HisbtnPlayedMusic.setBackgroundColor(0xFF6200EE);
+//                                            HisbtnRemoveMusic.setClickable(true);
+//                                            HisbtnRemoveMusic.setBackgroundColor(0xFF6200EE);
+//
+//                                            selectedPosition = position;
+//                                            notifyDataSetChanged();
+//                                        }
+//                                    });
                                     if (position == selectedPosition) {
                                         view.setBackgroundColor(Color.YELLOW);
                                     } else {
@@ -408,7 +400,7 @@ public class KaraHistory extends AppCompatActivity {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
         int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {KaraSession.class, KaraHistory.class, MusicPlayer.class, MusicLyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {
@@ -424,7 +416,7 @@ public class KaraHistory extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private void startActivityIntent(Class<?> cls) {
-        Intent intent = new Intent(KaraHistory.this, cls);
+        Intent intent = new Intent(History.this, cls);
         intent.putExtra("uid", uid);
         intent.putExtra("is_staff", is_staff);
         startActivity(intent);

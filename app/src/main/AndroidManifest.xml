@@ -18,8 +18,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:hardwareAccelerated="true" />
+        <activity
             android:name=".YoutubeAttach"
-            android:exported="false" />
+            android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
+            android:exported="false"
+            android:hardwareAccelerated="true" />
         <activity
             android:name=".Login"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
@@ -37,7 +44,7 @@
             android:exported="false"
             android:hardwareAccelerated="true" />
         <activity
-            android:name=".KaraSession"
+            android:name=".Session"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:exported="false"
             android:hardwareAccelerated="true" />
@@ -52,17 +59,17 @@
             android:exported="false"
             android:hardwareAccelerated="true" />
         <activity
-            android:name=".KaraHistory"
+            android:name=".History"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:exported="false"
             android:hardwareAccelerated="true" />
         <activity
-            android:name=".MusicPlayer"
+            android:name=".Player"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:exported="false"
             android:hardwareAccelerated="true" />
         <activity
-            android:name=".MusicLyrics"
+            android:name=".Lyrics"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:exported="false"
             android:hardwareAccelerated="true" />

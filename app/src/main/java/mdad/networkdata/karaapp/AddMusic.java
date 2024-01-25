@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -46,7 +45,7 @@ public class AddMusic extends AppCompatActivity {
     Button btnAttach,btnSubmit;
     YouTubePlayer youTubePlayer; // Declare youTubePlayer here
     private boolean isFullscreen = false;
-    private static String url_create_music = KaraSession.ipBaseAddress+"create_musicVolley.php";
+    private static String url_create_music = MainActivity.ipBaseAddress+"create_musicVolley.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,7 +182,7 @@ public class AddMusic extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Success in updating database",
                                     Toast.LENGTH_LONG).show();
                             finish();
-                            Intent intent = new Intent(getApplicationContext(), KaraSession.class);
+                            Intent intent = new Intent(getApplicationContext(), Session.class);
                             intent.putExtra("uid", uid);
                             intent.putExtra("is_staff", is_staff);
                             startActivity(intent);
@@ -251,7 +250,7 @@ public class AddMusic extends AppCompatActivity {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
         int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {KaraSession.class, KaraHistory.class, MusicPlayer.class, MusicLyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {

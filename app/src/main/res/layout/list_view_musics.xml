@@ -9,14 +9,14 @@
         android:id="@+id/youtubePreviewImage"
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:layout_weight="9"
+        android:layout_weight="2"
         app:srcCompat="@drawable/thumbnail_placeholder" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginRight="5dp"
-        android:layout_weight="7"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
@@ -65,13 +65,5 @@
             android:visibility="visible" />
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnSelect"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_weight="10"
-        android:text="Select" />
 
 </LinearLayout>

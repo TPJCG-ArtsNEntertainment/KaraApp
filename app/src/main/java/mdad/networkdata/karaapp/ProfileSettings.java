@@ -28,8 +28,8 @@ public class ProfileSettings extends AppCompatActivity {
     String email, verifyPassword, password, confirmPassword, nickName, uid, is_staff;
     Boolean is_staffBoolean, verified;
     private final int verify_user=1, update_user=2;
-    private static String url_verify_user = KaraSession.ipBaseAddress+"verify_userVolley.php";
-    private static String url_update_user = KaraSession.ipBaseAddress+"update_userVolley.php";
+    private static String url_verify_user = MainActivity.ipBaseAddress+"verify_userVolley.php";
+    private static String url_update_user = MainActivity.ipBaseAddress+"update_userVolley.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +82,7 @@ public class ProfileSettings extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                Intent intent = new Intent(getApplicationContext(), KaraSession.class);
+                Intent intent = new Intent(getApplicationContext(), Session.class);
                 intent.putExtra("uid", uid);
                 intent.putExtra("is_staff", is_staff);
                 startActivity(intent);
@@ -128,7 +128,7 @@ public class ProfileSettings extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Success in updating database",
                                         Toast.LENGTH_LONG).show();
                                 finish();
-                                Intent intent = new Intent(getApplicationContext(), KaraSession.class);
+                                Intent intent = new Intent(getApplicationContext(), Session.class);
                                 intent.putExtra("uid", uid);
                                 intent.putExtra("is_staff", is_staff);
                                 startActivity(intent);
@@ -174,7 +174,7 @@ public class ProfileSettings extends AppCompatActivity {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
         int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {KaraSession.class, KaraHistory.class, MusicPlayer.class, MusicLyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {
