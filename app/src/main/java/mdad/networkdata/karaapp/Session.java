@@ -89,6 +89,7 @@ public class Session extends Fragment {
     private Button btnAddMusic, btnEditMusic, btnPlayedMusic, btnRemoveMusic, btnPower;
     private YouTubePlayer youTubePlayer;
     private ListView listView;
+    private View lastSelectedView = null;
     private LinearLayout buttonLinearLayout;
     private ImageView closedSessionImage;
     private TextView closedSessionLabel;
@@ -172,7 +173,15 @@ public class Session extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (lastSelectedView != null) {
+                    lastSelectedView.setBackgroundColor(com.google.android.material.R.attr.colorOnPrimary); //clear color
+                }
+                view.setBackgroundColor(Color.YELLOW);
+                lastSelectedView = view;
                 selectedMusicId = ((TextView) view.findViewById(R.id.mid)).getText().toString();
+                selectedMusicName = ((TextView) view.findViewById(R.id.mName)).getText().toString();
+                selectedMusicUrl = ((TextView) view.findViewById(R.id.mUrl)).getText().toString();
+                selectedMusicArtist = ((TextView) view.findViewById(R.id.mArtist)).getText().toString();
             }
         });
 
@@ -207,62 +216,6 @@ public class Session extends Fragment {
                 postData(url_update_power, param_update, update_power);
             }
         });
-
-//        btnEditMusic = (Button) view.findViewById(R.id.btnQueueEdit);
-//        btnEditMusic.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                System.out.println(selectedMusicId);
-//                Intent intent = new Intent(requireActivity(), EditMusic.class);
-//                intent.putExtra("uid", ((MainActivity) getActivity()).uid);
-//                intent.putExtra("is_staff", ((MainActivity) getActivity()).is_staff);
-//                intent.putExtra("username", ((MainActivity) getActivity()).username);
-//                intent.putExtra("mid", selectedMusicId);
-//                startActivity(intent);
-//            }
-//        });
-//
-//        btnPlayedMusic = (Button) view.findViewById(R.id.btnSetPlayed);
-//        btnPlayedMusic.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Map<String, String> params_update = new HashMap<String, String>();
-//                params_update.put("mid", selectedMusicId);
-//                params_update.put("music_name", selectedMusicName);
-//                params_update.put("artist_name", selectedMusicArtist);
-//                params_update.put("url", selectedMusicUrl);
-//                params_update.put("is_played", "1");
-//                postData(url_update_musio, params_update, update_delete_music);
-//            }
-//        });
-//
-//        btnRemoveMusic = (Button) view.findViewById(R.id.btnQueueRemove);
-//        btnRemoveMusic.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Map<String, String> params_update = new HashMap<String, String>();
-//                params_update.put("mid", selectedMusicId);
-//                postData(url_delete_music, params_update, update_delete_music);
-//            }
-//        });
-//        buttonLinearLayout = view.findViewById(R.id.mainPageButtonLinearLayout);
-
-//        Check Staff
-//        if(!((MainActivity) getActivity()).is_staffBoolean){
-//            buttonLinearLayout.setVisibility(View.GONE);
-//            btnPower.setVisibility(View.GONE);
-//        }else if(((MainActivity) getActivity()).is_staffBoolean){
-//            buttonLinearLayout.setVisibility(View.VISIBLE);
-//            btnPower.setVisibility(View.VISIBLE);
-//        }
-//        if(selectedMusicId == null){
-//            btnEditMusic.setClickable(false);
-//            btnEditMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-//            btnPlayedMusic.setClickable(false);
-//            btnPlayedMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-//            btnRemoveMusic.setClickable(false);
-//            btnRemoveMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-//        }
     }
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -275,26 +228,40 @@ public class Session extends Fragment {
         HashMap<String, String> rowData = musicsList.get(info.position);
         int itemId = item.getItemId();
         if (itemId == R.id.option_play) {
-                selectedMusicName = rowData.get("music_name");
-                selectedMusicUrl = rowData.get("url");
-                String videoId = extractVideoId(selectedMusicUrl);
-                youTubePlayer.loadVideo(videoId,1);
-                Toast.makeText(requireActivity(), "Playing: " + selectedMusicName, Toast.LENGTH_SHORT).show();
+            selectedMusicName = rowData.get("music_name");
+            selectedMusicUrl = rowData.get("url");
+            String videoId = extractVideoId(selectedMusicUrl);
+            youTubePlayer.loadVideo(videoId,1);
+            Toast.makeText(requireActivity(), "Playing: " + selectedMusicName, Toast.LENGTH_SHORT).show();
         } else if (itemId == R.id.option_set_played) {
-            // Handle action
-            // You can use info.position to get the position of the selected item
+            Map<String, String> params_update = new HashMap<String, String>();
+            params_update.put("mid", selectedMusicId);
+            params_update.put("music_name", selectedMusicName);
+            params_update.put("artist_name", selectedMusicArtist);
+            params_update.put("url", selectedMusicUrl);
+            params_update.put("is_played", "1");
+            postData(url_update_music, params_update, update_delete_music);
         } else if (itemId == R.id.option_set_unplayed) {
-            // Handle action
-            // You can use info.position to get the position of the selected item
+            Map<String, String> params_update = new HashMap<String, String>();
+            params_update.put("mid", selectedMusicId);
+            params_update.put("music_name", selectedMusicName);
+            params_update.put("artist_name", selectedMusicArtist);
+            params_update.put("url", selectedMusicUrl);
+            params_update.put("is_played", "0");
+            postData(url_update_music, params_update, update_delete_music);
         } else if (itemId == R.id.option_edit) {
-            // Handle action
-            // You can use info.position to get the position of the selected item
+            Intent intent = new Intent(requireActivity(), EditMusic.class);
+            intent.putExtra("uid", ((MainActivity) getActivity()).uid);
+            intent.putExtra("is_staff", ((MainActivity) getActivity()).is_staff);
+            intent.putExtra("username", ((MainActivity) getActivity()).username);
+            intent.putExtra("mid", selectedMusicId);
+            startActivity(intent);
         } else if (itemId == R.id.option_remove) {
-            // Handle action
-            // You can use info.position to get the position of the selected item
+            Map<String, String> params_update = new HashMap<String, String>();
+            params_update.put("mid", selectedMusicId);
+            postData(url_delete_music, params_update, update_delete_music);
         } else {
             return super.onContextItemSelected(item);
-//            return false;
         }
         return true;
     }
@@ -354,39 +321,6 @@ public class Session extends Fragment {
                                         String videoId = extractVideoId(rowData.get("url"));
                                         String imageUrl = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
                                         Picasso.get().load(imageUrl).into(youtubePreviewImage);
-//                                        Button btnSelect = view.findViewById(R.id.btnSelect);
-//                                        btnSelect.setOnClickListener(new View.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(View v) {
-//                                                selectedMusicId = rowData.get("music_id");
-//                                                selectedMusicName = rowData.get("music_name");
-//                                                selectedMusicArtist = rowData.get("artist_name");
-//                                                selectedMusicUrl = rowData.get("url");
-//                                                String videoId = extractVideoId(selectedMusicUrl);
-//                                                youTubePlayer.loadVideo(videoId,1);
-//                                                Toast.makeText(requireActivity(), "Playing: " + selectedMusicName, Toast.LENGTH_SHORT).show();
-//
-//                                                buttonLinearLayout.setVisibility(View.VISIBLE);
-//
-//                                                if(((MainActivity) getActivity()).is_staffBoolean)
-//                                                {
-//                                                    btnEditMusic.setClickable(true);
-//                                                    btnEditMusic.setBackgroundColor(0xFF6200EE);
-//                                                    btnPlayedMusic.setClickable(true);
-//                                                    btnPlayedMusic.setBackgroundColor(0xFF6200EE);
-//                                                    btnRemoveMusic.setClickable(true);
-//                                                    btnRemoveMusic.setBackgroundColor(0xFF6200EE);
-//                                                }
-//
-//                                                selectedPosition = position;
-//                                                notifyDataSetChanged();
-//                                            }
-//                                        });
-                                        if (position == selectedPosition) {
-                                            view.setBackgroundColor(Color.YELLOW);
-                                        } else {
-                                            view.setBackgroundColor(Color.WHITE);
-                                        }
                                         return view;
                                     }
                                 };
@@ -410,12 +344,6 @@ public class Session extends Fragment {
 
                                 }
                                 selectedPosition = -1;
-//                                btnEditMusic.setClickable(false);
-//                                btnEditMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-//                                btnPlayedMusic.setClickable(false);
-//                                btnPlayedMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-//                                btnRemoveMusic.setClickable(false);
-//                                btnRemoveMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                                 ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
                             }
                         }
@@ -429,8 +357,7 @@ public class Session extends Fragment {
                                 closedSessionLabel.setVisibility(View.GONE);
                                 listView.setVisibility(View.VISIBLE);
                                 btnAddMusic.setClickable(true);
-                                btnAddMusic.setBackgroundColor(0xFF6200EE);
-//                                btnPower.setText("Off");
+                                btnAddMusic.setBackgroundColor();
                                 btnPower.setBackgroundColor(0xFFFF0000);
                             }
                             if (power) {
@@ -439,7 +366,6 @@ public class Session extends Fragment {
                                 closedSessionLabel.setVisibility(View.VISIBLE);
                                 btnAddMusic.setClickable(false);
                                 btnAddMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-//                                btnPower.setText("On");
                                 btnPower.setBackgroundColor(0xFF4CAF50);
                             }
                         }
