@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,13 +40,14 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
 public class AddMusic extends AppCompatActivity {
-    EditText inputMusic,inputArtist,inputUrl;
-    String attachUrl,attachName,attachArtist,musicName,musicArtist,musicUrl,uid,is_staff;
-    Boolean is_staffBoolean;
-    Button btnAttach,btnSubmit;
-    YouTubePlayer youTubePlayer; // Declare youTubePlayer here
+    private String uid, is_staff, username;
+    private Boolean is_staffBoolean;
+    private EditText inputMusic,inputArtist,inputUrl;
+    private String attachUrl,attachName,attachArtist,musicName,musicArtist,musicUrl,musicCreatedBy;
+    private Button btnAttach,btnSubmit;
+    private YouTubePlayer youTubePlayer; // Declare youTubePlayer here
     private boolean isFullscreen = false;
-    private static String url_create_music = MainActivity.ipBaseAddress+"create_musicVolley.php";
+    private static String url_create_music = MainMenu.ipBaseAddress+"create_musicVolley.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,18 +55,19 @@ public class AddMusic extends AppCompatActivity {
         setContentView(R.layout.activity_add_music);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        inputMusic = (EditText) findViewById(R.id.inputMusic);
-        inputArtist = (EditText) findViewById(R.id.inputArtist);
-        inputUrl = (EditText) findViewById(R.id.inputUrl);
-
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
+        username = intent.getStringExtra("username");
         is_staffBoolean = is_staff.equals("1");
 
         attachUrl = intent.getStringExtra("attachUrl");
         attachName = intent.getStringExtra("attachName");
         attachArtist = intent.getStringExtra("attachArtist");
+
+        inputMusic = (EditText) findViewById(R.id.inputMusic);
+        inputArtist = (EditText) findViewById(R.id.inputArtist);
+        inputUrl = (EditText) findViewById(R.id.inputUrl);
 
         inputUrl.setText(attachUrl);
         inputMusic.setText(attachName);
@@ -139,6 +142,7 @@ public class AddMusic extends AppCompatActivity {
                 Intent intent = new Intent(AddMusic.this,YoutubeAttach.class);
                 intent.putExtra("uid", uid);
                 intent.putExtra("is_staff", is_staff);
+                intent.putExtra("username", username);
                 startActivity(intent);
             }
         });
@@ -150,6 +154,7 @@ public class AddMusic extends AppCompatActivity {
                 musicName = inputMusic.getText().toString();
                 musicArtist = inputArtist.getText().toString();
                 musicUrl = inputUrl.getText().toString();
+                musicCreatedBy = MainMenu.username;
                 if (musicName.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "No fields must be empty",
                             Toast.LENGTH_LONG).show();
@@ -163,6 +168,7 @@ public class AddMusic extends AppCompatActivity {
                 params_create.put("music_name", musicName);
                 params_create.put("artist_name", musicArtist);
                 params_create.put("url", musicUrl);
+                params_create.put("created_by", musicCreatedBy);
 
                 postData(url_create_music, params_create);
             }
@@ -174,6 +180,7 @@ public class AddMusic extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Log.d("response",response);
                         if (response.equals("Error")) {
                             Toast.makeText(getApplicationContext(), "Error in updating database",
                                     Toast.LENGTH_LONG).show();
@@ -182,9 +189,10 @@ public class AddMusic extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), "Success in updating database",
                                     Toast.LENGTH_LONG).show();
                             finish();
-                            Intent intent = new Intent(getApplicationContext(), Session.class);
+                            Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                             intent.putExtra("uid", uid);
                             intent.putExtra("is_staff", is_staff);
+                            intent.putExtra("username", username);
                             startActivity(intent);
                         }
                     }
@@ -240,7 +248,7 @@ public class AddMusic extends AppCompatActivity {
             }
         }
         if (!is_staffBoolean) {
-            menu.findItem(R.id.item5).setVisible(false);
+            menu.findItem(R.id.item2).setVisible(false);
         }
         return true;
     }
@@ -249,8 +257,8 @@ public class AddMusic extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
-        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5};
+        Class<?>[] destinationClasses = {MainMenu.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {
@@ -266,9 +274,11 @@ public class AddMusic extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private void startActivityIntent(Class<?> cls) {
+        finish();
         Intent intent = new Intent(AddMusic.this, cls);
         intent.putExtra("uid", uid);
         intent.putExtra("is_staff", is_staff);
+        intent.putExtra("username", username);
         startActivity(intent);
     }
 }

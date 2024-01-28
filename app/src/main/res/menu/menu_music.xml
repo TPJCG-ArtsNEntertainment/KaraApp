@@ -4,6 +4,12 @@
         android:id="@+id/option_play"
         android:title="Play"/>
     <item
+        android:id="@+id/option_download_video"
+        android:title="Download Video"/>
+    <item
+        android:id="@+id/option_download_music"
+        android:title="Download Music"/>
+    <item
         android:id="@+id/option_set_played"
         android:title="Set Played"/>
     <item

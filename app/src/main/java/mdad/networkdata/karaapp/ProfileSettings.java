@@ -28,8 +28,8 @@ public class ProfileSettings extends AppCompatActivity {
     String email, verifyPassword, password, confirmPassword, nickName, uid, is_staff;
     Boolean is_staffBoolean, verified;
     private final int verify_user=1, update_user=2;
-    private static String url_verify_user = MainActivity.ipBaseAddress+"verify_userVolley.php";
-    private static String url_update_user = MainActivity.ipBaseAddress+"update_userVolley.php";
+    private static String url_verify_user = MainMenu.ipBaseAddress+"verify_userVolley.php";
+    private static String url_update_user = MainMenu.ipBaseAddress+"update_userVolley.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +173,7 @@ public class ProfileSettings extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
-        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5};
         Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {

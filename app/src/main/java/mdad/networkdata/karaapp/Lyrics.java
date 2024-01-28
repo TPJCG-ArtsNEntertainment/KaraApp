@@ -1,34 +1,57 @@
 package mdad.networkdata.karaapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class Lyrics extends AppCompatActivity {
-    String uid,is_staff;
-    Boolean is_staffBoolean;
-    WebView webView;
-    WebSettings webSettings;
+public class Lyrics extends Fragment {
+    private static final String ARG_PARAM1 = "param1",ARG_PARAM2 = "param2";
+    private String mParam1, mParam2;
+    public Lyrics(){};
+    public static Lyrics newInstance(String param1, String param2) {
+        Lyrics lyrics = new Lyrics();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        lyrics.setArguments(args);
+        return lyrics;
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lyrics);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.activity_lyrics, container, false);
+    }
+    private WebView webView;
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        Intent intent = getIntent();
-        uid = intent.getStringExtra("uid");
-        is_staff = intent.getStringExtra("is_staff");
-        is_staffBoolean = is_staff.equals("1");
+//        Intent intent = getIntent();
+//        uid = intent.getStringExtra("uid");
+//        is_staff = intent.getStringExtra("is_staff");
+//        is_staffBoolean = is_staff.equals("1");
 
-        webView = findViewById(R.id.webView);
-        webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
+        webView = view.findViewById(R.id.webView);
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -44,59 +67,13 @@ public class Lyrics extends AppCompatActivity {
         }
     }
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         webView.saveState(outState);
     }
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        webView.restoreState(savedInstanceState);
-    }
-    @Override
-    //add the option menu to the activity
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the option menu and display the option items when clicked;
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        String className = getClass().getSimpleName();
-        String[] words = className.split("(?=[A-Z])");
-        className = String.join(" ", words).trim();
-        for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item.getTitle().toString().equals(className)) {
-                item.setVisible(false);
-            }
-        }
-        if (!is_staffBoolean) {
-            menu.findItem(R.id.item5).setVisible(false);
-        }
-        return true;
-    }
-    @Override
-    //when the option item is selected
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        // Array of menu items with their corresponding destination classes
-        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
-        // Iterate over menu items and check conditions
-        for (int i = 0; i < menuItems.length; i++) {
-            if (id == menuItems[i]) {
-                // Start the activity for the selected menu item
-                startActivityIntent(destinationClasses[i]);
-                return true;
-            } else if (id == android.R.id.home) {
-                onBackPressed();
-                return true;
-            }
-        }
-        // If the selected item is not found in the loop, fallback to super.onOptionsItemSelected
-        return super.onOptionsItemSelected(item);
-    }
-    private void startActivityIntent(Class<?> cls) {
-        Intent intent = new Intent(Lyrics.this, cls);
-        intent.putExtra("uid", uid);
-        intent.putExtra("is_staff", is_staff);
-        startActivity(intent);
-    }
+//    @Override
+//    public void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        webView.restoreState(savedInstanceState);
+//    }
 }

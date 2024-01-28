@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,24 +19,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class YoutubeAttach extends AppCompatActivity {
-    String uid,is_staff,attachName,attachArtist;
+    String uid,is_staff,username,attachName,attachArtist;
     Boolean is_staffBoolean;
     WebView webView;
     Button InsertLink;
-    WebSettings webSettings;
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_youtube_attach);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
+        username = intent.getStringExtra("username");
         is_staffBoolean = is_staff.equals("1");
 
         webView = findViewById(R.id.webViewYoutube);
-        webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -92,6 +95,7 @@ public class YoutubeAttach extends AppCompatActivity {
                                     Intent youtube = new Intent(YoutubeAttach.this, AddMusic.class);
                                     youtube.putExtra("uid", uid);
                                     youtube.putExtra("is_staff", is_staff);
+                                    youtube.putExtra("username", username);
                                     youtube.putExtra("attachUrl", webView.getUrl());
                                     youtube.putExtra("attachName", attachName);
                                     youtube.putExtra("attachArtist", attachArtist);
@@ -113,21 +117,6 @@ public class YoutubeAttach extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         webView.restoreState(savedInstanceState);
-    }
-
-    public String extractVideoId(String url) {
-        String videoId = "";
-        try {
-            // Regular expression pattern to match YouTube video IDs
-            Pattern pattern = Pattern.compile("^.*(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|&v=)([^#&?]*).*");
-            Matcher matcher = pattern.matcher(url);
-            if (matcher.matches() && matcher.group(2).length() == 11) {
-                videoId = matcher.group(2);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return videoId;
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -152,8 +141,8 @@ public class YoutubeAttach extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
-        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5};
+        Class<?>[] destinationClasses = {MainMenu.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {
@@ -174,6 +163,7 @@ public class YoutubeAttach extends AppCompatActivity {
         Intent intent = new Intent(YoutubeAttach.this, cls);
         intent.putExtra("uid", uid);
         intent.putExtra("is_staff", is_staff);
+        intent.putExtra("username", username);
         startActivity(intent);
     }
 

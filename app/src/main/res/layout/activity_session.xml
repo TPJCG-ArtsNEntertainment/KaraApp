@@ -40,18 +40,20 @@
             android:layout_gravity="center"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btnJump"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:text="Jump To Queue" />
+            <SearchView
+                android:id="@+id/queueSearchView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:maxWidth="250dp"
+                android:minWidth="200dp" />
 
             <Button
                 android:id="@+id/btnPower"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginHorizontal="5dp"
+                android:layout_weight="3"
                 app:icon="@drawable/baseline_power_settings_new_24"
                 app:iconGravity="textEnd"
                 app:iconPadding="1dp" />
@@ -59,9 +61,12 @@
             <Button
                 android:id="@+id/btnQueueAdd"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginHorizontal="5dp"
-                android:text="Add Music" />
+                android:layout_weight="3"
+                app:icon="@drawable/baseline_add_24"
+                app:iconGravity="textEnd"
+                app:iconPadding="1dp" />
 
         </LinearLayout>
 
@@ -87,38 +92,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:longClickable="true"
-            android:visibility="gone"/>
-
-<!--        <LinearLayout-->
-<!--            android:id="@+id/mainPageButtonLinearLayout"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:orientation="horizontal">-->
-
-<!--            <Button-->
-<!--                android:id="@+id/btnQueueEdit"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:layout_marginHorizontal="20dp"-->
-<!--                android:text="Edit" />-->
-
-<!--            <Button-->
-<!--                android:id="@+id/btnSetPlayed"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:layout_marginHorizontal="20dp"-->
-<!--                android:text="Played" />-->
-
-<!--            <Button-->
-<!--                android:id="@+id/btnQueueRemove"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:layout_marginHorizontal="20dp"-->
-<!--                android:text="Remove" />-->
-<!--        </LinearLayout>-->
+            android:visibility="gone" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

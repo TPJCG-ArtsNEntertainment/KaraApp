@@ -21,9 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Login extends AppCompatActivity {
-    EditText inputEmail, inputPassword;
-    Button btnLogin, btnRegister;
-    private static String url_verify_user = MainActivity.ipBaseAddress+"verify_userVolley.php";
+    private String uid, is_staff, username;
+    private EditText inputEmail, inputPassword;
+    private Button btnLogin, btnRegister;
+    private static String url_verify_user = MainMenu.ipBaseAddress+"verify_userVolley.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,25 +72,24 @@ public class Login extends AppCompatActivity {
                         }
                         String[] user = response.split("\\|");
                         String[] details = user[0].split(";");
-                        String uid = details[0];
-                        String email = details[1];
-                        String password = details[2];
-                        String name = details[3];
-                        String is_staff = details[4];
+                        String login_uid = details[0];
+                        String login_email = details[1];
+                        String login_password = details[2];
+                        String login_name = details[3];
+                        String login_is_staff = details[4];
+
+                        uid = login_uid;
+                        is_staff = login_is_staff;
 
                         finish();
-                        Intent intent = new Intent(Login.this, MainActivity.class);
+                        Intent intent = new Intent(Login.this, MainMenu.class);
                         intent.putExtra("uid", uid);
                         intent.putExtra("is_staff", is_staff);
-                        if (name == null){
-                            Toast.makeText(getApplicationContext(), "Logging in to "+email,
-                                    Toast.LENGTH_LONG).show();
-                            intent.putExtra("username", email);
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Logging in to "+name,
-                                    Toast.LENGTH_LONG).show();
-                            intent.putExtra("username", name);
-                        }
+                        if (login_name == null) username = login_email;
+                        else username = login_name;
+                        intent.putExtra("username", username);
+                        Toast.makeText(getApplicationContext(), "Logging in to "+username,
+                                Toast.LENGTH_LONG).show();
                         startActivity(intent);
                     }
                 }, new Response.ErrorListener() {

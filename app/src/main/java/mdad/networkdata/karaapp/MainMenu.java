@@ -10,14 +10,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class MainActivity extends AppCompatActivity {
-    private String uid,is_staff;
-    private Boolean is_staffBoolean;
+public class MainMenu extends AppCompatActivity {
+    public static String uid, is_staff, username;
+    public static Boolean is_staffBoolean;
     public static ViewPager2 viewPager;
     public static String ipBaseAddress = "http://aetpjcgkara.atspace.cc/";
     private FragmentStateAdapter pagerAdapter;
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
+        username = intent.getStringExtra("username");
         is_staffBoolean = is_staff.equals("1");
 
         viewPager = findViewById(R.id.mypager);
@@ -51,12 +51,15 @@ public class MainActivity extends AppCompatActivity {
                 case 0: {
                     return Session.newInstance("session",null);
                 }
-//                case 1: {
-//                    return SecondFragment.newInstance("fragment 2", null);
-//                }
-//                case 2: {
-//                    return ThirdFragment.newInstance("fragment 3", null);
-//                }
+                case 1: {
+                    return History.newInstance("history", null);
+                }
+                case 2: {
+                    return Player.newInstance("player", null);
+                }
+                case 3: {
+                    return Lyrics.newInstance("lyrics", null);
+                }
                 default:
                     return new Fragment();
             }
@@ -71,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     //add the option menu to the activity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the option menu and display the option items when clicked;
-        getMenuInflater().inflate(R.menu.menu_action_bar, menu);
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         String className = getClass().getSimpleName();
         String[] words = className.split("(?=[A-Z])");
         className = String.join(" ", words).trim();
@@ -82,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (!is_staffBoolean) {
-            menu.findItem(R.id.item5).setVisible(false);
+            menu.findItem(R.id.item2).setVisible(false);
         }
         return true;
     }
@@ -91,8 +94,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
-        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6, R.id.item7, R.id.item8};
-        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5};
+        Class<?>[] destinationClasses = {MainMenu.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
             if (id == menuItems[i]) {
@@ -108,9 +111,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private void startActivityIntent(Class<?> cls) {
-        Intent intent = new Intent(MainActivity.this, cls);
+        Intent intent = new Intent(MainMenu.this, cls);
         intent.putExtra("uid", uid);
         intent.putExtra("is_staff", is_staff);
+        intent.putExtra("username", username);
         startActivity(intent);
     }
 }
