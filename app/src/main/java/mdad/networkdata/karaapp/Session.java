@@ -96,11 +96,10 @@ public class Session extends Fragment {
     private SearchView queueSearchView;
     private ImageView closedSessionImage;
     private TextView closedSessionLabel;
-    private ArrayList<HashMap<String, String>> musicsList;
     private boolean isFullscreen = false, power;
     private String selectedMusicId, selectedMusicName, selectedMusicArtist, selectedMusicUrl, selectedMusicCreatedBy;
     private final int get_all_queue_music = 1, update_delete_music =2, get_power=3, update_power=4;
-    private ArrayList<HashMap<String, String>> originalMusicsList,filteredMusicsList,targetList;
+    private ArrayList<HashMap<String, String>> musicsList, originalMusicsList,filteredMusicsList,targetList;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -137,11 +136,9 @@ public class Session extends Fragment {
         });
 
         btnAddMusic = (Button) view.findViewById(R.id.btnQueueAdd);
-        btnAddMusic.setOnClickListener(new View.OnClickListener()
-        {
+        btnAddMusic.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
             //Create an Intent here to load the second activity
                 Intent intent = new Intent(requireActivity(), AddMusic.class);
                 intent.putExtra("uid", MainMenu.uid);

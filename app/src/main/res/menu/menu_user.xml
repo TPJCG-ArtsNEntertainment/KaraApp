@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/option_set_staff"
+        android:title="Set As Staff"/>
+    <item
+        android:id="@+id/option_set_user"
+        android:title="Set As User"/>
+    <item
+        android:id="@+id/option_edit"
+        android:title="Edit"/>
+    <item
+        android:id="@+id/option_remove"
+        android:title="Remove"/>
+</menu>
