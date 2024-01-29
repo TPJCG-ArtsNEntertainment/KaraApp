@@ -73,7 +73,6 @@ public class Login extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        System.out.println(response);
                         if (requestType == verify_device){
                             if (response.equals("Error, false request.")) {
                                 Toast.makeText(getApplicationContext(), "Error in verify device",

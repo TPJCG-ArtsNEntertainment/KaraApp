@@ -5,14 +5,17 @@
         android:title="@string/item1"/>
     <item
         android:id="@+id/item2"
-        android:title="@string/item2" />
+        android:title="@string/item2"/>
     <item
         android:id="@+id/item3"
         android:title="@string/item3" />
     <item
         android:id="@+id/item4"
-        android:title="@string/item4"/>
+        android:title="@string/item4" />
     <item
         android:id="@+id/item5"
         android:title="@string/item5"/>
+    <item
+        android:id="@+id/item6"
+        android:title="@string/item6"/>
 </menu>

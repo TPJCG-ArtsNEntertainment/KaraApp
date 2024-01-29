@@ -31,8 +31,8 @@ public class MainMenu extends AppCompatActivity {
     public static ViewPager2 viewPager;
     public static String ipBaseAddress = "http://aetpjcgkara.atspace.cc/";
     private FragmentStateAdapter pagerAdapter;
-    private String[] titles = new String[]{"Session", "History", "Player", "Lyrics"};
-    private static final int NUM_PAGES = 4;
+    private String[] titles = new String[]{"Session", "Player", "Lyrics"};
+    private static final int NUM_PAGES = 3;
     private static String url_update_device = MainMenu.ipBaseAddress+"update_deviceVolley.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +64,9 @@ public class MainMenu extends AppCompatActivity {
                     return Session.newInstance("session",null);
                 }
                 case 1: {
-                    return History.newInstance("history", null);
-                }
-                case 2: {
                     return Player.newInstance("player", null);
                 }
-                case 3: {
+                case 2: {
                     return Lyrics.newInstance("lyrics", null);
                 }
                 default:
@@ -97,7 +94,7 @@ public class MainMenu extends AppCompatActivity {
             }
         }
         if (!is_staffBoolean) {
-            menu.findItem(R.id.item2).setVisible(false);
+            menu.findItem(R.id.item3).setVisible(false);
         }
         return true;
     }
@@ -106,18 +103,17 @@ public class MainMenu extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
-        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4};
-        Class<?>[] destinationClasses = {MainMenu.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class};
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5};
+        Class<?>[] destinationClasses = {MainMenu.class, History.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
-            if (id == R.id.item5){
+            if (id == R.id.item6){
                 Map<String, String> param_update = new HashMap<>();
                 param_update.put("uid", uid);
                 param_update.put("token", "");
                 postData(url_update_device, param_update);
             } else if (id == menuItems[i]) {
                 // Start the activity for the selected menu item
-                finish();
                 startActivityIntent(destinationClasses[i]);
                 return true;
             } else if (id == android.R.id.home) {

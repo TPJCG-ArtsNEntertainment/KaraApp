@@ -5,15 +5,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.ContextMenu;
-import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -37,7 +37,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.tabs.TabLayout;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener;
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.FullscreenListener;
@@ -55,66 +54,51 @@ import java.util.regex.Pattern;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
-public class History extends Fragment {
-    private static final String ARG_PARAM1 = "param1",ARG_PARAM2 = "param2";
-    private String mParam1, mParam2;
-    public History(){};
-    public static History newInstance(String param1, String param2) {
-        History history = new History();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        history.setArguments(args);
-        return history;
-    }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.activity_history, container, false);
-    }
-
+public class History extends AppCompatActivity {
+    public static String uid, is_staff, username;
+    public static Boolean is_staffBoolean;
     private static String url_all_history_musics = MainMenu.ipBaseAddress+"get_all_musicHistoryVolley.php";
     private static String url_update_music = MainMenu.ipBaseAddress+"update_musicVolley.php";
     private static String url_delete_music = MainMenu.ipBaseAddress+"delete_musicVolley.php";
+    private static String url_update_device = MainMenu.ipBaseAddress+"update_deviceVolley.php";
     private Button btnAddMusic;
-    private YouTubePlayer youTubePlayer;
-    private ListView listViewHistory;
+    private YouTubePlayer youTubePlayerHistory;
+    private ListView recyclerViewHistory;
     private SearchView historySearchView;
-    private ArrayList<HashMap<String, String>> musicsList;
     private boolean isFullscreen = false;
-    private String selectedMusicId, selectedMusicName, selectedMusicArtist, selectedMusicUrl, selectedMusicCreatedBy;
-    private final int get_all_history_music = 1, update_delete_music =2;
-    private ArrayList<HashMap<String, String>> originalMusicsList,filteredMusicsList;
+    private String selectedMusicIdHistory, selectedMusicNameHistory, selectedMusicArtistHistory, selectedMusicUrlHistory, selectedMusicCreatedByHistory;
+    private final int get_all_history_music = 1, update_delete_music =2, update_device=3;
+    private ArrayList<HashMap<String, String>> musicHistoryList, originalMusicHistoryList, filteredMusicHistoryList, targetHistoryList;
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_history);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        uid = intent.getStringExtra("uid");
+        is_staff = intent.getStringExtra("is_staff");
+        username = intent.getStringExtra("username");
+        is_staffBoolean = is_staff.equals("1");
 
         // get resource id of ListView
-        listViewHistory = (ListView)view.findViewById(R.id.listViewHistory);
-        registerForContextMenu(listViewHistory);
+        recyclerViewHistory = (ListView) findViewById(R.id.listViewHistory);
+        registerForContextMenu(recyclerViewHistory);
         // ArrayList to store product info in Hashmap for ListView
-        musicsList = new ArrayList<HashMap<String, String>>();
+        musicHistoryList = new ArrayList<HashMap<String, String>>();
         // re-usable method to use Volley to retrieve products from database
         postData(url_all_history_musics, null, get_all_history_music);
 
-        historySearchView = view.findViewById(R.id.historySearchView);
+        historySearchView = findViewById(R.id.historySearchView);
         ListAdapter originalAdapter = new SimpleAdapter(
-                requireActivity(), musicsList,
+                getApplicationContext(), musicHistoryList,
                 R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"},
                 new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
         );
-        originalMusicsList = musicsList;
-        filteredMusicsList = new ArrayList<>(originalMusicsList);
-        listViewHistory.setAdapter(originalAdapter);
+        originalMusicHistoryList = musicHistoryList;
+        filteredMusicHistoryList = new ArrayList<>(originalMusicHistoryList);
+        recyclerViewHistory.setAdapter(originalAdapter);
         historySearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -128,12 +112,12 @@ public class History extends Fragment {
             }
         });
 
-        btnAddMusic = (Button) view.findViewById(R.id.btnHistoryAdd);
+        btnAddMusic = (Button) findViewById(R.id.btnHistoryAdd);
         btnAddMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Create an Intent here to load the second activity
-                Intent intent = new Intent(requireActivity(), AddMusic.class);
+                Intent intent = new Intent(getApplicationContext(), AddMusic.class);
                 intent.putExtra("uid", MainMenu.uid);
                 intent.putExtra("is_staff", MainMenu.is_staff);
                 intent.putExtra("username", MainMenu.username);
@@ -142,11 +126,11 @@ public class History extends Fragment {
         });
 
 //        YoutubePlayer Logic
-        requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), onBackPressedCallback);
-        YouTubePlayerView youTubePlayerView = view.findViewById(R.id.historyPageYoutubePlayer);
-        LinearLayout linearLayout = view.findViewById(R.id.historyPageLinearLayout);
-        FrameLayout fullscreenViewContainer = view.findViewById(R.id.historyPageFullScreenViewContainer);
-        TabLayout tabLayout = requireActivity().findViewById(R.id.tab_layout);
+        getOnBackPressedDispatcher().addCallback(History.this, onBackPressedCallback);
+        YouTubePlayerView youTubePlayerView = findViewById(R.id.historyPageYoutubePlayer);
+        LinearLayout linearLayout = findViewById(R.id.historyPageLinearLayout);
+        FrameLayout fullscreenViewContainer = findViewById(R.id.historyPageFullScreenViewContainer);
+//        TabLayout tabLayout = getApplicationContext().findViewById(R.id.tab_layout);
         IFramePlayerOptions iFramePlayerOptions = new IFramePlayerOptions.Builder()
                 .controls(1)
                 .fullscreen(1)
@@ -158,15 +142,15 @@ public class History extends Fragment {
                 isFullscreen = true;
                 youTubePlayerView.setVisibility(View.GONE);
                 linearLayout.setVisibility(View.GONE);
-                tabLayout.setVisibility(View.GONE);
+//                tabLayout.setVisibility(View.GONE);
                 fullscreenViewContainer.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.addView(fullscreenView);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Window window = requireActivity().getWindow();
+                    Window window = History.this.getWindow();
                     window.setDecorFitsSystemWindows(false);
                     window.setNavigationBarColor(History.this.getResources().getColor(android.R.color.black));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+                    ActionBar actionBar = ((AppCompatActivity) getApplicationContext()).getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.hide();
                     }
@@ -177,15 +161,15 @@ public class History extends Fragment {
                 isFullscreen = false;
                 youTubePlayerView.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
-                tabLayout.setVisibility(View.VISIBLE);
+//                tabLayout.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.setVisibility(View.GONE);
                 fullscreenViewContainer.removeAllViews();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Window window = requireActivity().getWindow();
+                    Window window = History.this.getWindow();
                     window.setDecorFitsSystemWindows(true);
                     window.setNavigationBarColor(History.this.getResources().getColor(android.R.color.transparent));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
+                    ActionBar actionBar = ((AppCompatActivity) getApplicationContext()).getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.show();
                     }
@@ -194,13 +178,13 @@ public class History extends Fragment {
         });
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
             @Override
-            public void onReady(YouTubePlayer youTubePlayer) {
-                History.this.youTubePlayer = youTubePlayer;
-                if (musicsList.size() > 0) {
-                    HashMap<String, String> firstVideo = musicsList.get(0);
+            public void onReady(YouTubePlayer youTubePlayerHistory) {
+                History.this.youTubePlayerHistory = youTubePlayerHistory;
+                if (musicHistoryList.size() > 0) {
+                    HashMap<String, String> firstVideo = musicHistoryList.get(0);
                     String firstVideoUrl = firstVideo.get("url");
                     String firstVideoId = extractVideoId(firstVideoUrl);
-                    youTubePlayer.cueVideo(firstVideoId, 0f);
+                    youTubePlayerHistory.cueVideo(firstVideoId, 0f);
                 }
             }
         }, iFramePlayerOptions);
@@ -210,9 +194,10 @@ public class History extends Fragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        requireActivity().getMenuInflater().inflate(R.menu.menu_music, menu);
+        this.getMenuInflater().inflate(R.menu.menu_music, menu);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        HashMap<String, String> rowData = musicsList.get(info.position);
+        HashMap<String, String> rowData = musicHistoryList.get(info.position);
+        System.out.println(rowData);
         Boolean is_owner = MainMenu.username.equals(rowData.get("created_by"));
         menu.findItem(R.id.option_set_played).setVisible(false);
 
@@ -228,51 +213,51 @@ public class History extends Fragment {
     }
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
+        Log.d("History", "onContextItemSelected in History.java");
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        ArrayList<HashMap<String, String>> targetList;
-        if (filteredMusicsList.isEmpty()) targetList = musicsList;
-        else targetList = filteredMusicsList;
-        HashMap<String, String> rowData = targetList.get(info.position);
-        selectedMusicId = rowData.get("mid");
-        selectedMusicName = rowData.get("music_name");
-        selectedMusicArtist = rowData.get("artist_name");
-        selectedMusicUrl = rowData.get("url");
-        selectedMusicCreatedBy = rowData.get("created_by");
+        if (filteredMusicHistoryList.isEmpty()) targetHistoryList = musicHistoryList;
+        else targetHistoryList = filteredMusicHistoryList;
+        HashMap<String, String> rowDataHistory = targetHistoryList.get(info.position);
+        selectedMusicIdHistory = rowDataHistory.get("mid");
+        selectedMusicNameHistory = rowDataHistory.get("music_name");
+        selectedMusicArtistHistory = rowDataHistory.get("artist_name");
+        selectedMusicUrlHistory = rowDataHistory.get("url");
+        selectedMusicCreatedByHistory = rowDataHistory.get("created_by");
         int itemId = item.getItemId();
         if (itemId == R.id.option_play) {
-            String videoId = extractVideoId(selectedMusicUrl);
-            youTubePlayer.loadVideo(videoId,1);
-            Toast.makeText(requireActivity(), "Playing: " + selectedMusicName, Toast.LENGTH_SHORT).show();
+            String videoId = extractVideoId(selectedMusicUrlHistory);
+            youTubePlayerHistory.loadVideo(videoId,1);
+            Toast.makeText(getApplicationContext(), "Playing: " + selectedMusicNameHistory, Toast.LENGTH_SHORT).show();
 //        } else if (itemId == R.id.option_download_video) {
 //        } else if (itemId == R.id.option_download_music) {
         } else if (itemId == R.id.option_set_played) {
             Map<String, String> params_update = new HashMap<String, String>();
-            params_update.put("mid", selectedMusicId);
-            params_update.put("music_name", selectedMusicName);
-            params_update.put("artist_name", selectedMusicArtist);
-            params_update.put("url", selectedMusicUrl);
-            params_update.put("created_by", selectedMusicCreatedBy);
+            params_update.put("mid", selectedMusicIdHistory);
+            params_update.put("music_name", selectedMusicNameHistory);
+            params_update.put("artist_name", selectedMusicArtistHistory);
+            params_update.put("url", selectedMusicUrlHistory);
+            params_update.put("created_by", selectedMusicCreatedByHistory);
             params_update.put("is_played", "1");
             postData(url_update_music, params_update, update_delete_music);
         } else if (itemId == R.id.option_set_unplayed) {
             Map<String, String> params_update = new HashMap<String, String>();
-            params_update.put("mid", selectedMusicId);
-            params_update.put("music_name", selectedMusicName);
-            params_update.put("artist_name", selectedMusicArtist);
-            params_update.put("url", selectedMusicUrl);
-            params_update.put("created_by", selectedMusicCreatedBy);
+            params_update.put("mid", selectedMusicIdHistory);
+            params_update.put("music_name", selectedMusicNameHistory);
+            params_update.put("artist_name", selectedMusicArtistHistory);
+            params_update.put("url", selectedMusicUrlHistory);
+            params_update.put("created_by", selectedMusicCreatedByHistory);
             params_update.put("is_played", "0");
             postData(url_update_music, params_update, update_delete_music);
         } else if (itemId == R.id.option_edit) {
-            Intent intent = new Intent(requireActivity(), EditMusic.class);
+            Intent intent = new Intent(getApplicationContext(), EditMusic.class);
             intent.putExtra("uid", MainMenu.uid);
             intent.putExtra("is_staff", MainMenu.is_staff);
             intent.putExtra("username", MainMenu.username);
-            intent.putExtra("mid", selectedMusicId);
+            intent.putExtra("mid", selectedMusicIdHistory);
             startActivity(intent);
         } else if (itemId == R.id.option_remove) {
             Map<String, String> params_update = new HashMap<String, String>();
-            params_update.put("mid", selectedMusicId);
+            params_update.put("mid", selectedMusicIdHistory);
             postData(url_delete_music, params_update, update_delete_music);
         } else {
             return super.onContextItemSelected(item);
@@ -281,21 +266,21 @@ public class History extends Fragment {
     }
 
     private void filter(String query) {
-        filteredMusicsList.clear();
+        filteredMusicHistoryList.clear();
         if (TextUtils.isEmpty(query)) {
             // If the query is empty, show all items
-            filteredMusicsList.addAll(originalMusicsList);
+            filteredMusicHistoryList.addAll(originalMusicHistoryList);
         } else {
             // Filter items based on the query
-            for (HashMap<String, String> music : originalMusicsList) {
+            for (HashMap<String, String> music : originalMusicHistoryList) {
                 if (music.get("music_name").toLowerCase().contains(query.toLowerCase())) {
-                    filteredMusicsList.add(music);
+                    filteredMusicHistoryList.add(music);
                 } else if (music.get("artist_name").toLowerCase().contains(query.toLowerCase())) {
-                    filteredMusicsList.add(music);
+                    filteredMusicHistoryList.add(music);
                 } else if (music.get("created_at").toLowerCase().contains(query.toLowerCase())) {
-                    filteredMusicsList.add(music);
+                    filteredMusicHistoryList.add(music);
                 } else if (music.get("created_by").toLowerCase().contains(query.toLowerCase())) {
-                    filteredMusicsList.add(music);
+                    filteredMusicHistoryList.add(music);
                 }
             }
         }
@@ -303,14 +288,14 @@ public class History extends Fragment {
 //        Collections.reverse(filteredMusicsList);
         // Update the adapter with the filtered data
         ListAdapter filteredAdapter = new SimpleAdapter(
-                requireActivity(), filteredMusicsList,
+                getApplicationContext(), filteredMusicHistoryList,
                 R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"},
                 new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
         ){
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
-                final HashMap<String, String> rowData = filteredMusicsList.get(position);
+                final HashMap<String, String> rowData = filteredMusicHistoryList.get(position);
                 ImageView youtubePreviewImage = view.findViewById(R.id.youtubePreviewImage);
                 String videoId = extractVideoId(rowData.get("url"));
                 String imageUrl = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
@@ -318,12 +303,12 @@ public class History extends Fragment {
                 return view;
             }
         };
-        listViewHistory.setAdapter(filteredAdapter);
+        recyclerViewHistory.setAdapter(filteredAdapter);
     }
 
     public void postData(String url, Map params, final int requestType) {
         //create a RequestQueue for Volley
-        RequestQueue requestQueue = Volley.newRequestQueue(requireActivity());
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         //create a StringRequest for Volley for HTTP Post
         StringRequest stringRequest = new StringRequest( Request.Method.POST, url,
                 //response from server
@@ -333,7 +318,7 @@ public class History extends Fragment {
                         if (requestType == get_all_history_music) {
                             //check if error code received from server.
                             if (response.equals("Error")) {
-                                Toast.makeText(requireActivity(), "Error in retrieving database", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Error in retrieving database", Toast.LENGTH_LONG).show();
                                 return;
                             }
                             //handle the response data received from server
@@ -361,18 +346,18 @@ public class History extends Fragment {
                                 map.put("created_by", created_by);
 
                                 // adding map HashList to ArrayList
-                                musicsList.add(map);
+                                musicHistoryList.add(map);
                             }
-                            Collections.reverse(musicsList);
+                            Collections.reverse(musicHistoryList);
                             //populate the listview with product information from Hashmap
                             ListAdapter adapter = new SimpleAdapter(
-                                    requireActivity(), musicsList,
+                                    getApplicationContext(), musicHistoryList,
                                     R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"}, new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
                             ){
                                 @Override
                                 public View getView(int position, View convertView, ViewGroup parent) {
                                     View view = super.getView(position, convertView, parent);
-                                    final HashMap<String, String> rowData = musicsList.get(position);
+                                    final HashMap<String, String> rowData = musicHistoryList.get(position);
                                     ImageView youtubePreviewImage = view.findViewById(R.id.youtubePreviewImage);
                                     String videoId = extractVideoId(rowData.get("url"));
                                     String imageUrl = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
@@ -381,26 +366,35 @@ public class History extends Fragment {
                                 }
                             };
                             // updating listview
-                            listViewHistory.setAdapter(adapter);
+                            recyclerViewHistory.setAdapter(adapter);
                         }
                         if (requestType == update_delete_music) {
                             System.out.println(response);
                             if (response.trim().equals("Error")) {
-                                Toast.makeText(requireActivity(), "Error in updating database", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Error in updating database", Toast.LENGTH_LONG).show();
                             }
                             if (response.trim().equals("Success")) {
-                                Toast.makeText(requireActivity(), "Success in updating database", Toast.LENGTH_LONG).show();
-                                for (int i = 0; i < musicsList.size(); i++) {
-                                    HashMap<String, String> map = musicsList.get(i);
+                                Toast.makeText(getApplicationContext(), "Success in updating database", Toast.LENGTH_LONG).show();
+                                for (int i = 0; i < musicHistoryList.size(); i++) {
+                                    HashMap<String, String> map = musicHistoryList.get(i);
                                     String musicId = map.get("music_id");
-                                    if (musicId.equals(selectedMusicId)) {
-                                        musicsList.remove(i);
+                                    if (musicId.equals(selectedMusicIdHistory)) {
+                                        musicHistoryList.remove(i);
                                         break;
                                     }
 
                                 }
-                                ((BaseAdapter) listViewHistory.getAdapter()).notifyDataSetChanged();
+                                ((BaseAdapter) recyclerViewHistory.getAdapter()).notifyDataSetChanged();
                             }
+                        }
+                        if (requestType == update_device){
+                            if (response.equals("Error, false request.")) {
+                                Toast.makeText(getApplicationContext(), "Error in verify device",
+                                        Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            finish();
+                            startActivityIntent(Login.class);
                         }
                     }
                 },
@@ -409,7 +403,7 @@ public class History extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // handle error
-                        Toast.makeText(requireActivity(),"Error in retrieving database",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"Error in retrieving database",Toast.LENGTH_LONG).show();
                     }
                 }
         ){
@@ -442,8 +436,61 @@ public class History extends Fragment {
         @Override
         public void handleOnBackPressed() {
             if (isFullscreen) {
-                youTubePlayer.toggleFullscreen();
+                youTubePlayerHistory.toggleFullscreen();
             }
         }
     };
+    @Override
+    //add the option menu to the activity
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the option menu and display the option items when clicked;
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        String className = getClass().getSimpleName();
+        String[] words = className.split("(?=[A-Z])");
+        className = String.join(" ", words).trim();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            if (item.getTitle().toString().equals(className)) {
+                item.setVisible(false);
+            }
+        }
+        if (!is_staffBoolean) {
+            menu.findItem(R.id.item2).setVisible(false);
+        }
+        return true;
+    }
+    @Override
+    //when the option item is selected
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        // Array of menu items with their corresponding destination classes
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6};
+        Class<?>[] destinationClasses = {MainMenu.class, History.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class};
+        // Iterate over menu items and check conditions
+        for (int i = 0; i < menuItems.length; i++) {
+            if (id == R.id.item6){
+                Map<String, String> param_update = new HashMap<>();
+                param_update.put("uid", uid);
+                param_update.put("token", "");
+                postData(url_update_device, param_update, update_device);
+            } else if (id == menuItems[i]) {
+                // Start the activity for the selected menu item
+                finish();
+                startActivityIntent(destinationClasses[i]);
+                return true;
+            } else if (id == android.R.id.home) {
+                onBackPressed();
+                return true;
+            }
+        }
+        // If the selected item is not found in the loop, fallback to super.onOptionsItemSelected
+        return super.onOptionsItemSelected(item);
+    }
+    private void startActivityIntent(Class<?> cls) {
+        Intent intent = new Intent(History.this, cls);
+        intent.putExtra("uid", uid);
+        intent.putExtra("is_staff", is_staff);
+        intent.putExtra("username", username);
+        startActivity(intent);
+    }
 }
