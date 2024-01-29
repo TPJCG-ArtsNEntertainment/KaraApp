@@ -438,6 +438,9 @@ public class History extends AppCompatActivity {
             if (isFullscreen) {
                 youTubePlayerHistory.toggleFullscreen();
             }
+            else {
+                finish();
+            }
         }
     };
     @Override
@@ -455,7 +458,7 @@ public class History extends AppCompatActivity {
             }
         }
         if (!is_staffBoolean) {
-            menu.findItem(R.id.item2).setVisible(false);
+            menu.findItem(R.id.item3).setVisible(false);
         }
         return true;
     }

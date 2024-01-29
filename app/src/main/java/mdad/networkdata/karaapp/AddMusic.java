@@ -48,6 +48,8 @@ public class AddMusic extends AppCompatActivity {
     private YouTubePlayer youTubePlayer; // Declare youTubePlayer here
     private boolean isFullscreen = false;
     private static String url_create_music = MainMenu.ipBaseAddress+"create_musicVolley.php";
+    private static String url_update_device = MainMenu.ipBaseAddress+"update_deviceVolley.php";
+    private final int create_music=1, update_device=2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,30 +172,40 @@ public class AddMusic extends AppCompatActivity {
                 params_create.put("url", musicUrl);
                 params_create.put("created_by", musicCreatedBy);
 
-                postData(url_create_music, params_create);
+                postData(url_create_music, params_create, create_music);
             }
         });
     }
-    public void postData(String url, Map params) {
+    public void postData(String url, Map params, final int requestType) {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("response",response);
-                        if (response.equals("Error")) {
-                            Toast.makeText(getApplicationContext(), "Error in updating database",
-                                    Toast.LENGTH_LONG).show();
+                        if (requestType == create_music){
+                            if (response.equals("Error")) {
+                                Toast.makeText(getApplicationContext(), "Error in updating database",
+                                        Toast.LENGTH_LONG).show();
+                            }
+                            if (response.equals("Success")) {
+                                Toast.makeText(getApplicationContext(), "Success in updating database",
+                                        Toast.LENGTH_LONG).show();
+                                finish();
+                                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
+                                intent.putExtra("uid", uid);
+                                intent.putExtra("is_staff", is_staff);
+                                intent.putExtra("username", username);
+                                startActivity(intent);
+                            }
                         }
-                        if (response.equals("Success")) {
-                            Toast.makeText(getApplicationContext(), "Success in updating database",
-                                    Toast.LENGTH_LONG).show();
+                        if (requestType == update_device){
+                            if (response.equals("Error, false request.")) {
+                                Toast.makeText(getApplicationContext(), "Error in verify device",
+                                        Toast.LENGTH_LONG).show();
+                                return;
+                            }
                             finish();
-                            Intent intent = new Intent(getApplicationContext(), MainMenu.class);
-                            intent.putExtra("uid", uid);
-                            intent.putExtra("is_staff", is_staff);
-                            intent.putExtra("username", username);
-                            startActivity(intent);
+                            startActivityIntent(Login.class);
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -248,7 +260,7 @@ public class AddMusic extends AppCompatActivity {
             }
         }
         if (!is_staffBoolean) {
-            menu.findItem(R.id.item2).setVisible(false);
+            menu.findItem(R.id.item3).setVisible(false);
         }
         return true;
     }
@@ -257,12 +269,18 @@ public class AddMusic extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
-        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5};
-        Class<?>[] destinationClasses = {MainMenu.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5, R.id.item6};
+        Class<?>[] destinationClasses = {MainMenu.class, History.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
-            if (id == menuItems[i]) {
+            if (id == R.id.item6){
+                Map<String, String> param_update = new HashMap<>();
+                param_update.put("uid", uid);
+                param_update.put("token", "");
+                postData(url_update_device, param_update, update_device);
+            } else if (id == menuItems[i]) {
                 // Start the activity for the selected menu item
+                finish();
                 startActivityIntent(destinationClasses[i]);
                 return true;
             } else if (id == android.R.id.home) {
@@ -274,7 +292,6 @@ public class AddMusic extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     private void startActivityIntent(Class<?> cls) {
-        finish();
         Intent intent = new Intent(AddMusic.this, cls);
         intent.putExtra("uid", uid);
         intent.putExtra("is_staff", is_staff);

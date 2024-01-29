@@ -29,7 +29,6 @@ public class Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         inputEmail = (EditText) findViewById(R.id.inputRegisterEmail);
         inputPassword = (EditText) findViewById(R.id.inputRegisterPassword);

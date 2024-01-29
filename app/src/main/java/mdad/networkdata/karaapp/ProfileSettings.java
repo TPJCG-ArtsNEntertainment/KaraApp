@@ -25,11 +25,12 @@ import java.util.Map;
 public class ProfileSettings extends AppCompatActivity {
     EditText inputUpdateEmail, inputUpdateVerifyPassword, inputUpdatePassword, inputUpdateConfirmPassword, inputUpdateNickname;
     Button btnSubmitUpdateUser, btnCancelEdit;
-    String email, verifyPassword, password, confirmPassword, nickName, uid, is_staff;
+    String email, verifyPassword, password, confirmPassword, nickName, uid, is_staff, username;
     Boolean is_staffBoolean, verified;
-    private final int verify_user=1, update_user=2;
+    private final int verify_user=1, update_user=2, update_device=3;
     private static String url_verify_user = MainMenu.ipBaseAddress+"verify_userVolley.php";
     private static String url_update_user = MainMenu.ipBaseAddress+"update_userVolley.php";
+    private static String url_update_device = MainMenu.ipBaseAddress+"update_deviceVolley.php";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +40,7 @@ public class ProfileSettings extends AppCompatActivity {
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
+        username = intent.getStringExtra("username");
         is_staffBoolean = is_staff.equals("1");
 
         inputUpdateEmail = (EditText) findViewById(R.id.inputUpdateEmail);
@@ -133,6 +135,14 @@ public class ProfileSettings extends AppCompatActivity {
                                 intent.putExtra("is_staff", is_staff);
                                 startActivity(intent);
                             }
+                        } if (requestType == update_device){
+                            if (response.equals("Error, false request.")) {
+                                Toast.makeText(getApplicationContext(), "Error in verify device",
+                                        Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            finish();
+                            startActivityIntent(Login.class);
                         }
                     }
                 }, new Response.ErrorListener() {
@@ -163,7 +173,7 @@ public class ProfileSettings extends AppCompatActivity {
             }
         }
         if (!is_staffBoolean) {
-            menu.findItem(R.id.item5).setVisible(false);
+            menu.findItem(R.id.item3).setVisible(false);
         }
         return true;
     }
@@ -174,10 +184,16 @@ public class ProfileSettings extends AppCompatActivity {
         int id = item.getItemId();
         // Array of menu items with their corresponding destination classes
         int[] menuItems = {R.id.item1, R.id.item2, R.id.item3, R.id.item4, R.id.item5};
-        Class<?>[] destinationClasses = {Session.class, History.class, Player.class, Lyrics.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class, Login.class};
+        Class<?>[] destinationClasses = {MainMenu.class, History.class, UserManagement.class, ProfileSettings.class, RulesAndRegulations.class};
         // Iterate over menu items and check conditions
         for (int i = 0; i < menuItems.length; i++) {
-            if (id == menuItems[i]) {
+            if (id == R.id.item6){
+                Map<String, String> param_update = new HashMap<>();
+                param_update.put("uid", uid);
+                param_update.put("token", "");
+                postData(url_update_device, param_update, update_device);
+            } else if (id == menuItems[i]) {
+                finish();
                 // Start the activity for the selected menu item
                 startActivityIntent(destinationClasses[i]);
                 return true;
@@ -194,6 +210,7 @@ public class ProfileSettings extends AppCompatActivity {
         Intent intent = new Intent(ProfileSettings.this, cls);
         intent.putExtra("uid", uid);
         intent.putExtra("is_staff", is_staff);
+        intent.putExtra("username", username);
         startActivity(intent);
     }
 }
