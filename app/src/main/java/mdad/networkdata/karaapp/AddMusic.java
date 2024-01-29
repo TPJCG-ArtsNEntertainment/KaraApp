@@ -103,6 +103,9 @@ public class AddMusic extends AppCompatActivity {
                         actionBar.hide();
                     }
                 }
+                View decorView = getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
             }
             @Override
             public void onExitFullscreen() {
@@ -121,13 +124,16 @@ public class AddMusic extends AppCompatActivity {
                         actionBar.show();
                     }
                 }
+                View decorView = getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
+                decorView.setSystemUiVisibility(uiOptions);
             }
         });
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(YouTubePlayer youTubePlayer) {
                 AddMusic.this.youTubePlayer = youTubePlayer;
-                youTubePlayer.loadVideo("7L3Hdp86aio", 0f);
+                youTubePlayer.cueVideo("7L3Hdp86aio", 0f);
                 if (attachUrl != null) {
                     String videoId = extractVideoId(attachUrl);
                     youTubePlayer.loadVideo(videoId,1);
@@ -280,7 +286,6 @@ public class AddMusic extends AppCompatActivity {
                 postData(url_update_device, param_update, update_device);
             } else if (id == menuItems[i]) {
                 // Start the activity for the selected menu item
-                finish();
                 startActivityIntent(destinationClasses[i]);
                 return true;
             } else if (id == android.R.id.home) {

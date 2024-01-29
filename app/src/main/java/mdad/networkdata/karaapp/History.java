@@ -155,6 +155,9 @@ public class History extends AppCompatActivity {
                         actionBar.hide();
                     }
                 }
+                View decorView = getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
             }
             @Override
             public void onExitFullscreen() {
@@ -174,6 +177,9 @@ public class History extends AppCompatActivity {
                         actionBar.show();
                     }
                 }
+                View decorView = getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
+                decorView.setSystemUiVisibility(uiOptions);
             }
         });
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
@@ -478,7 +484,6 @@ public class History extends AppCompatActivity {
                 postData(url_update_device, param_update, update_device);
             } else if (id == menuItems[i]) {
                 // Start the activity for the selected menu item
-                finish();
                 startActivityIntent(destinationClasses[i]);
                 return true;
             } else if (id == android.R.id.home) {

@@ -198,6 +198,9 @@ public class Session extends Fragment {
                         actionBar.hide();
                     }
                 }
+                View decorView = requireActivity().getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
             }
             @Override
             public void onExitFullscreen() {
@@ -217,6 +220,9 @@ public class Session extends Fragment {
                         actionBar.show();
                     }
                 }
+                View decorView = requireActivity().getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
+                decorView.setSystemUiVisibility(uiOptions);
             }
         });
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {

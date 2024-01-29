@@ -193,7 +193,6 @@ public class ProfileSettings extends AppCompatActivity {
                 param_update.put("token", "");
                 postData(url_update_device, param_update, update_device);
             } else if (id == menuItems[i]) {
-                finish();
                 // Start the activity for the selected menu item
                 startActivityIntent(destinationClasses[i]);
                 return true;

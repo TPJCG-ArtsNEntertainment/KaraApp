@@ -282,7 +282,6 @@ public class EditMusic extends AppCompatActivity {
                 postData(url_update_device, param_update, update_device);
             } else if (id == menuItems[i]) {
                 // Start the activity for the selected menu item
-                finish();
                 startActivityIntent(destinationClasses[i]);
                 return true;
             } else if (id == android.R.id.home) {
