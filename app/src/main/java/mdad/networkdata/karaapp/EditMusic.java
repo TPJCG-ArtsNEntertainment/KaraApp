@@ -39,10 +39,10 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
 public class EditMusic extends AppCompatActivity {
-    String uid, is_staff, username, mid, music_name, music_artist, music_url, created_at, created_by, is_played;
-    EditText editTextMusic, editTextArtist, editTextUrl;
-    Button btnEditAttach, btnEditSubmit;
-    YouTubePlayer youTubePlayer;
+    private String uid,is_staff,username,mid,intent_from,attachUrl,attachName,attachArtist,music_name,music_artist,music_url,created_at,created_by,is_played;
+    private EditText editTextMusic, editTextArtist, editTextUrl;
+    private Button btnEditAttach, btnEditSubmit;
+    private YouTubePlayer youTubePlayer;
     private boolean isFullscreen = false, is_staffBoolean;
     private static final String url_music_details = MainMenu.ipBaseAddress+"get_music_detailsVolley.php";
     private static final String url_update_product = MainMenu.ipBaseAddress+"update_musicVolley.php";
@@ -65,10 +65,22 @@ public class EditMusic extends AppCompatActivity {
         username = intent.getStringExtra("username");
         is_staffBoolean = is_staff.equals("1");
         mid = intent.getStringExtra("mid");
-        Map<String,String> param_mid = new HashMap<String, String>();
-        param_mid.put("mid",mid);
+        is_played = intent.getStringExtra("is_played");
+        intent_from = intent.getStringExtra("intent_from");
+        if (intent_from.equals("MusicListView")){
+            Map<String,String> param_mid = new HashMap<String, String>();
+            param_mid.put("mid",mid);
+            postData(url_music_details, param_mid, get_music_details);
+        }
 
-        postData(url_music_details, param_mid, get_music_details);
+
+        attachUrl = intent.getStringExtra("attachUrl");
+        attachName = intent.getStringExtra("attachName");
+        attachArtist = intent.getStringExtra("attachArtist");
+
+        editTextMusic.setText(attachName);
+        editTextArtist.setText(attachArtist);
+        editTextUrl.setText(attachUrl);
 
 //        YoutubePlayer Logic
         getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
@@ -98,6 +110,9 @@ public class EditMusic extends AppCompatActivity {
                         actionBar.hide();
                     }
                 }
+                View decorView = getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
             }
             @Override
             public void onExitFullscreen() {
@@ -116,13 +131,20 @@ public class EditMusic extends AppCompatActivity {
                         actionBar.show();
                     }
                 }
+                View decorView = getWindow().getDecorView();
+                int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
+                decorView.setSystemUiVisibility(uiOptions);
             }
         });
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(YouTubePlayer youTubePlayer) {
                 EditMusic.this.youTubePlayer = youTubePlayer;
-                youTubePlayer.loadVideo(extractVideoId(music_url), 0f);
+                youTubePlayer.cueVideo(extractVideoId(music_url), 0f);
+                if (attachUrl != null) {
+                    String videoId = extractVideoId(attachUrl);
+                    youTubePlayer.cueVideo(videoId,1);
+                }
             }
         }, iFramePlayerOptions);
         getLifecycle().addObserver(youTubePlayerView);
@@ -132,9 +154,15 @@ public class EditMusic extends AppCompatActivity {
         btnEditAttach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String musicUrl = editTextUrl.getText().toString();
-                String videoId = extractVideoId(musicUrl);
-                youTubePlayer.loadVideo(videoId,1);
+                finish();
+                Intent intent = new Intent(EditMusic.this,YoutubeAttach.class);
+                intent.putExtra("uid", uid);
+                intent.putExtra("is_staff", is_staff);
+                intent.putExtra("username", username);
+                intent.putExtra("mid",mid);
+                intent.putExtra("is_played", is_played);
+                intent.putExtra("intent_from", "EditMusic");
+                startActivity(intent);
             }
         });
 
@@ -162,6 +190,7 @@ public class EditMusic extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        System.out.println(response);
                         if (requestType == get_music_details) {
                             if (response.equals("Error")) {
                                 Toast.makeText(getApplicationContext(), "Error in accessing database", Toast.LENGTH_LONG).show();
@@ -182,7 +211,6 @@ public class EditMusic extends AppCompatActivity {
                             editTextUrl.setText(music_url);
                         }
                         if (requestType == update_music) {
-                            System.out.println(response);
                             if (response.trim().equals("Error")) {
                                 Toast.makeText(getApplicationContext(), "Error in updating database", Toast.LENGTH_LONG).show();
                             }
@@ -192,6 +220,7 @@ public class EditMusic extends AppCompatActivity {
                                 Intent intent = new Intent(getApplicationContext(), Session.class);
                                 intent.putExtra("uid", uid);
                                 intent.putExtra("is_staff", is_staff);
+                                intent.putExtra("username", username);
                                 startActivity(intent);
                             }
                         }

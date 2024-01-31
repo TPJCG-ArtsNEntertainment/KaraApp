@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class YoutubeAttach extends AppCompatActivity {
-    String uid,is_staff,username,attachName,attachArtist;
+    String uid,is_staff,username,mid,is_played,intent_from,attachName,attachArtist;
     Boolean is_staffBoolean;
     WebView webView;
     Button InsertLink;
@@ -46,6 +46,9 @@ public class YoutubeAttach extends AppCompatActivity {
         is_staff = intent.getStringExtra("is_staff");
         username = intent.getStringExtra("username");
         is_staffBoolean = is_staff.equals("1");
+        mid = intent.getStringExtra("mid");
+        is_played = intent.getStringExtra("is_played");
+        intent_from = intent.getStringExtra("intent_from");
 
         webView = findViewById(R.id.webViewYoutube);
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -102,16 +105,31 @@ public class YoutubeAttach extends AppCompatActivity {
                                         attachName = values[0].substring(1);;
                                         attachArtist = values[1].substring(0, values[1].length() - 1);;
                                     }
-
-                                    // Handle the title as needed, for example, pass it to another activity
-                                    Intent youtube = new Intent(YoutubeAttach.this, AddMusic.class);
-                                    youtube.putExtra("uid", uid);
-                                    youtube.putExtra("is_staff", is_staff);
-                                    youtube.putExtra("username", username);
-                                    youtube.putExtra("attachUrl", webView.getUrl());
-                                    youtube.putExtra("attachName", attachName);
-                                    youtube.putExtra("attachArtist", attachArtist);
-                                    startActivity(youtube);
+                                    if (intent_from.equals("AddMusic")){
+                                        // Handle the title as needed, for example, pass it to another activity
+                                        finish();
+                                        Intent youtube = new Intent(YoutubeAttach.this, AddMusic.class);
+                                        youtube.putExtra("uid", uid);
+                                        youtube.putExtra("is_staff", is_staff);
+                                        youtube.putExtra("username", username);
+                                        youtube.putExtra("attachUrl", webView.getUrl());
+                                        youtube.putExtra("attachName", attachName);
+                                        youtube.putExtra("attachArtist", attachArtist);
+                                        startActivity(youtube);
+                                    } if (intent_from.equals("EditMusic")){
+                                        finish();
+                                        Intent youtube = new Intent(YoutubeAttach.this, EditMusic.class);
+                                        youtube.putExtra("uid", uid);
+                                        youtube.putExtra("is_staff", is_staff);
+                                        youtube.putExtra("username", username);
+                                        youtube.putExtra("mid",mid);
+                                        youtube.putExtra("is_played",is_played);
+                                        youtube.putExtra("intent_from", "YoutubeAttach");
+                                        youtube.putExtra("attachUrl", webView.getUrl());
+                                        youtube.putExtra("attachName", attachName);
+                                        youtube.putExtra("attachArtist", attachArtist);
+                                        startActivity(youtube);
+                                    }
                                 } else {
                                     Log.e("Title", "Title element not found in the HTML");
                                 }

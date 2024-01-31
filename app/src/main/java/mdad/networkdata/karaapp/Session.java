@@ -302,6 +302,7 @@ public class Session extends Fragment {
             intent.putExtra("is_staff", MainMenu.is_staff);
             intent.putExtra("username", MainMenu.username);
             intent.putExtra("mid", selectedMusicId);
+            intent.putExtra("intent_from", "MusicListView");
             startActivity(intent);
         } else if (itemId == R.id.option_remove) {
             Map<String, String> params_update = new HashMap<String, String>();

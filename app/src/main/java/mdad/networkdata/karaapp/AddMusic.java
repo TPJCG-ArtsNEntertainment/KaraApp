@@ -133,10 +133,9 @@ public class AddMusic extends AppCompatActivity {
             @Override
             public void onReady(YouTubePlayer youTubePlayer) {
                 AddMusic.this.youTubePlayer = youTubePlayer;
-                youTubePlayer.cueVideo("7L3Hdp86aio", 0f);
                 if (attachUrl != null) {
                     String videoId = extractVideoId(attachUrl);
-                    youTubePlayer.loadVideo(videoId,1);
+                    youTubePlayer.cueVideo(videoId,1);
                 }
             }
         }, iFramePlayerOptions);
@@ -147,10 +146,12 @@ public class AddMusic extends AppCompatActivity {
         btnAttach.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
                 Intent intent = new Intent(AddMusic.this,YoutubeAttach.class);
                 intent.putExtra("uid", uid);
                 intent.putExtra("is_staff", is_staff);
                 intent.putExtra("username", username);
+                intent.putExtra("intent_from", "AddMusic");
                 startActivity(intent);
             }
         });
