@@ -219,12 +219,11 @@ public class History extends AppCompatActivity {
     }
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        Log.d("History", "onContextItemSelected in History.java");
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         if (filteredMusicHistoryList.isEmpty()) targetHistoryList = musicHistoryList;
         else targetHistoryList = filteredMusicHistoryList;
         HashMap<String, String> rowDataHistory = targetHistoryList.get(info.position);
-        selectedMusicIdHistory = rowDataHistory.get("mid");
+        selectedMusicIdHistory = rowDataHistory.get("music_id");
         selectedMusicNameHistory = rowDataHistory.get("music_name");
         selectedMusicArtistHistory = rowDataHistory.get("artist_name");
         selectedMusicUrlHistory = rowDataHistory.get("url");

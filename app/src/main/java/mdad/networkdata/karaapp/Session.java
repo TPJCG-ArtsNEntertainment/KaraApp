@@ -261,7 +261,6 @@ public class Session extends Fragment {
     }
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        Log.d("Session", "onContextItemSelected in Session.java");
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         if (filteredMusicsList.isEmpty()) targetList = musicsList;
         else targetList = filteredMusicsList;
@@ -415,7 +414,6 @@ public class Session extends Fragment {
                             listView.setAdapter(adapter);
                         }
                         if (requestType == update_delete_music) {
-                            System.out.println(response);
                             if (response.trim().equals("Error")) {
                                 Toast.makeText(requireActivity(), "Error in updating database", Toast.LENGTH_LONG).show();
                             }
