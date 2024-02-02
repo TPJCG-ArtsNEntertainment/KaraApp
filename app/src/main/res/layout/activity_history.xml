@@ -37,6 +37,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/black_200"
             android:orientation="horizontal">
 
             <SearchView
@@ -54,7 +55,8 @@
                 android:layout_marginHorizontal="5dp"
                 app:icon="@drawable/baseline_add_24"
                 app:iconGravity="textEnd"
-                app:iconPadding="1dp" />
+                app:iconPadding="1dp"
+                app:iconTint="#FFFFFF" />
         </LinearLayout>
 
         <ListView

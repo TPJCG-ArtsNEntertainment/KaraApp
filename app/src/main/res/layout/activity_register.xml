@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Email:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
 
         <EditText
             android:id="@+id/inputRegisterEmail"
@@ -41,7 +42,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Password:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
         <EditText
             android:id="@+id/inputRegisterPassword"
             android:layout_width="wrap_content"
@@ -64,7 +66,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Confirm Password:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
         <EditText
             android:id="@+id/inputRegisterConfirmPassword"
             android:layout_width="wrap_content"
@@ -87,7 +90,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="NickName:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
         <EditText
             android:id="@+id/inputRegisterNickName"
             android:layout_width="wrap_content"

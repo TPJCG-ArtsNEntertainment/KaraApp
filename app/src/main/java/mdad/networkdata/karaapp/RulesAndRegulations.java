@@ -28,6 +28,8 @@ public class RulesAndRegulations extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rules_regulations);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//         Set the ActionBar title with the activity name
+        setTitle(getClass().getSimpleName());
 
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");

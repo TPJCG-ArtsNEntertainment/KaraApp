@@ -29,6 +29,8 @@ public class Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+//         Set the ActionBar title with the activity name
+        setTitle(getClass().getSimpleName());
 
         inputEmail = (EditText) findViewById(R.id.inputRegisterEmail);
         inputPassword = (EditText) findViewById(R.id.inputRegisterPassword);

@@ -144,6 +144,7 @@ public class Session extends Fragment {
                 intent.putExtra("uid", MainMenu.uid);
                 intent.putExtra("is_staff", MainMenu.is_staff);
                 intent.putExtra("username", MainMenu.username);
+                intent.putExtra("intent_from_activity", "Session");
                 startActivity(intent);
             }
         });

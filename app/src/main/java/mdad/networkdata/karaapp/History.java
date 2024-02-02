@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,42 +54,51 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
 public class History extends AppCompatActivity {
-    public static String uid, is_staff, username;
-    public static Boolean is_staffBoolean;
+//    Declaration of String and Boolean for getIntent().
+    private String uid, is_staff, username;
+    private Boolean is_staffBoolean;
+//    Declaration of components from History's xml
+    private Button btnAddMusic;
+    private ListView listViewHistory;
+    private SearchView historySearchView;
+    private YouTubePlayer youTubePlayerHistory;
+    private boolean isFullscreen = false;
+//    Declaration of String and Array for selected item.
+    private String selectedMusicIdHistory, selectedMusicNameHistory, selectedMusicArtistHistory, selectedMusicUrlHistory, selectedMusicCreatedByHistory;
+    private ArrayList<HashMap<String, String>> musicHistoryList, originalMusicHistoryList, filteredMusicHistoryList, targetHistoryList;
+//    Declaration of Url address and requestType for postData
     private static String url_all_history_musics = MainMenu.ipBaseAddress+"get_all_musicHistoryVolley.php";
     private static String url_update_music = MainMenu.ipBaseAddress+"update_musicVolley.php";
     private static String url_delete_music = MainMenu.ipBaseAddress+"delete_musicVolley.php";
     private static String url_update_device = MainMenu.ipBaseAddress+"update_deviceVolley.php";
-    private Button btnAddMusic;
-    private YouTubePlayer youTubePlayerHistory;
-    private ListView recyclerViewHistory;
-    private SearchView historySearchView;
-    private boolean isFullscreen = false;
-    private String selectedMusicIdHistory, selectedMusicNameHistory, selectedMusicArtistHistory, selectedMusicUrlHistory, selectedMusicCreatedByHistory;
     private final int get_all_history_music = 1, update_delete_music =2, update_device=3;
-    private ArrayList<HashMap<String, String>> musicHistoryList, originalMusicHistoryList, filteredMusicHistoryList, targetHistoryList;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        Set this onCreate tide to corresponding xml
         setContentView(R.layout.activity_history);
+//        Enable back button in action bar
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//         Set the ActionBar title with the activity name
+        setTitle(getClass().getSimpleName());
 
+//        Get Variables from previous page
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
         username = intent.getStringExtra("username");
         is_staffBoolean = is_staff.equals("1");
 
-        // get resource id of ListView
-        recyclerViewHistory = (ListView) findViewById(R.id.listViewHistory);
-        registerForContextMenu(recyclerViewHistory);
-        // ArrayList to store product info in Hashmap for ListView
+//         Declaration of ListView
+        listViewHistory = (ListView) findViewById(R.id.listViewHistory);
+        registerForContextMenu(listViewHistory);
+//         ArrayList to store music info in Hashmap for ListView
         musicHistoryList = new ArrayList<HashMap<String, String>>();
-        // re-usable method to use Volley to retrieve products from database
+//         Perform postData to update ListView
         postData(url_all_history_musics, null, get_all_history_music);
 
-        historySearchView = findViewById(R.id.historySearchView);
+
+//        Get original ListAdapter from ListView's musicHistoryList
         ListAdapter originalAdapter = new SimpleAdapter(
                 getApplicationContext(), musicHistoryList,
                 R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"},
@@ -98,7 +106,10 @@ public class History extends AppCompatActivity {
         );
         originalMusicHistoryList = musicHistoryList;
         filteredMusicHistoryList = new ArrayList<>(originalMusicHistoryList);
-        recyclerViewHistory.setAdapter(originalAdapter);
+        listViewHistory.setAdapter(originalAdapter);
+
+//        Declaration of Search bar, query tide to update ListView with filter
+        historySearchView = findViewById(R.id.historySearchView);
         historySearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -112,76 +123,87 @@ public class History extends AppCompatActivity {
             }
         });
 
+//        Button Add Music to navigate to AddMusic Page
         btnAddMusic = (Button) findViewById(R.id.btnHistoryAdd);
         btnAddMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Create an Intent here to load the second activity
                 Intent intent = new Intent(getApplicationContext(), AddMusic.class);
                 intent.putExtra("uid", MainMenu.uid);
                 intent.putExtra("is_staff", MainMenu.is_staff);
                 intent.putExtra("username", MainMenu.username);
+                intent.putExtra("intent_from_activity", "History");
                 startActivity(intent);
             }
         });
 
-//        YoutubePlayer Logic
+//        --------Start of YoutubePlayer Logic---------
+//        Customize back button callback to exit fullscreen
         getOnBackPressedDispatcher().addCallback(History.this, onBackPressedCallback);
+//        Declaration of each layers for Youtube Player layouts
         YouTubePlayerView youTubePlayerView = findViewById(R.id.historyPageYoutubePlayer);
         LinearLayout linearLayout = findViewById(R.id.historyPageLinearLayout);
         FrameLayout fullscreenViewContainer = findViewById(R.id.historyPageFullScreenViewContainer);
-//        TabLayout tabLayout = getApplicationContext().findViewById(R.id.tab_layout);
         IFramePlayerOptions iFramePlayerOptions = new IFramePlayerOptions.Builder()
                 .controls(1)
                 .fullscreen(1)
                 .build();
+//        Disable auto initialization as we will customize initialization
         youTubePlayerView.setEnableAutomaticInitialization(false);
+//        Youtube player fullscreen listener
         youTubePlayerView.addFullscreenListener(new FullscreenListener() {
+//            -------- On Entering Fulllscreen----------
             @Override
             public void onEnterFullscreen(View fullscreenView, Function0<Unit> exitFullscreen) {
+//                Hide components upon Fullscreen and unhide fullscreen container
                 isFullscreen = true;
                 youTubePlayerView.setVisibility(View.GONE);
                 linearLayout.setVisibility(View.GONE);
-//                tabLayout.setVisibility(View.GONE);
                 fullscreenViewContainer.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.addView(fullscreenView);
+//                Hide Action Bar upon fullscreen
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     Window window = History.this.getWindow();
                     window.setDecorFitsSystemWindows(false);
                     window.setNavigationBarColor(History.this.getResources().getColor(android.R.color.black));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) getApplicationContext()).getSupportActionBar();
+                    ActionBar actionBar = getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.hide();
                     }
                 }
+//                Hide Notification bar on Android
                 View decorView = getWindow().getDecorView();
                 int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
                 decorView.setSystemUiVisibility(uiOptions);
             }
+//            -------------- On Exit Fullscreen --------------
             @Override
             public void onExitFullscreen() {
+//                Unhide components upon Fullscreen and hide fullscreen container
                 isFullscreen = false;
                 youTubePlayerView.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
-//                tabLayout.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.setVisibility(View.GONE);
                 fullscreenViewContainer.removeAllViews();
+//                Show Action Bar upon fullscreen
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     Window window = History.this.getWindow();
                     window.setDecorFitsSystemWindows(true);
                     window.setNavigationBarColor(History.this.getResources().getColor(android.R.color.transparent));
                 } else {
-                    ActionBar actionBar = ((AppCompatActivity) getApplicationContext()).getSupportActionBar();
+                    ActionBar actionBar = getSupportActionBar();
                     if (actionBar != null) {
                         actionBar.show();
                     }
                 }
+//                Show Notification bar on Android
                 View decorView = getWindow().getDecorView();
                 int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
                 decorView.setSystemUiVisibility(uiOptions);
             }
         });
+//        Customize initialization of Youtube Player
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(YouTubePlayer youTubePlayerHistory) {
@@ -195,7 +217,7 @@ public class History extends AppCompatActivity {
             }
         }, iFramePlayerOptions);
         getLifecycle().addObserver(youTubePlayerView);
-//        End of Youtube Player Logic
+//        ---------End of Youtube Player Logic--------
     }
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -203,7 +225,6 @@ public class History extends AppCompatActivity {
         this.getMenuInflater().inflate(R.menu.menu_music, menu);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         HashMap<String, String> rowData = musicHistoryList.get(info.position);
-        System.out.println(rowData);
         Boolean is_owner = MainMenu.username.equals(rowData.get("created_by"));
         menu.findItem(R.id.option_set_played).setVisible(false);
 
@@ -290,8 +311,7 @@ public class History extends AppCompatActivity {
                 }
             }
         }
-        // Reverse the order of the list
-//        Collections.reverse(filteredMusicsList);
+
         // Update the adapter with the filtered data
         ListAdapter filteredAdapter = new SimpleAdapter(
                 getApplicationContext(), filteredMusicHistoryList,
@@ -309,30 +329,31 @@ public class History extends AppCompatActivity {
                 return view;
             }
         };
-        recyclerViewHistory.setAdapter(filteredAdapter);
+        listViewHistory.setAdapter(filteredAdapter);
     }
 
+//    ---------- PostData Volley Function ----------
     public void postData(String url, Map params, final int requestType) {
-        //create a RequestQueue for Volley
+//        Declaration of volley request
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        //create a StringRequest for Volley for HTTP Post
+//        Declaration of string request for post parameters
         StringRequest stringRequest = new StringRequest( Request.Method.POST, url,
-                //response from server
+//                Upon receiving response, actions to be done.
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+//                        Response specified for retrieve all music history response
                         if (requestType == get_all_history_music) {
-                            //check if error code received from server.
+//                            check if error code received from server.
                             if (response.equals("Error")) {
                                 Toast.makeText(getApplicationContext(), "Error in retrieving database", Toast.LENGTH_LONG).show();
                                 return;
                             }
-                            //handle the response data received from server
-                            //store each product from database records in String array
+//                            store each music from database in String array
                             String[] musics = response.split("\\|");
-                            // for each product, retrieve the music details
+//                             for each product, retrieve the music details
                             for (int i = 0; i < musics.length; i++) {
-                                // Storing each product info in variable
+//                                 Storing each music info in variable
                                 String[] details = musics[i].split(";");
                                 String mid = details[0];
                                 String musicName = details[1];
@@ -341,9 +362,8 @@ public class History extends AppCompatActivity {
                                 String created_at = details[4];
                                 String created_by = details[5];
 
-                                // creating new HashMap
+                                // HashMap for each music details
                                 HashMap<String, String> map = new HashMap<String, String>();
-                                // adding each product info to HashMap key-value pair
                                 map.put("music_id", mid);
                                 map.put("music_name", musicName);
                                 map.put("artist_name", artistName);
@@ -354,12 +374,14 @@ public class History extends AppCompatActivity {
                                 // adding map HashList to ArrayList
                                 musicHistoryList.add(map);
                             }
+//                            Reverse the order to get newest record to be first
                             Collections.reverse(musicHistoryList);
-                            //populate the listview with product information from Hashmap
+//                            populate the listview with music information from Hashmap
                             ListAdapter adapter = new SimpleAdapter(
                                     getApplicationContext(), musicHistoryList,
                                     R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"}, new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
                             ){
+//                                Using Picasso to display preview image with youtube video ID
                                 @Override
                                 public View getView(int position, View convertView, ViewGroup parent) {
                                     View view = super.getView(position, convertView, parent);
@@ -371,11 +393,11 @@ public class History extends AppCompatActivity {
                                     return view;
                                 }
                             };
-                            // updating listview
-                            recyclerViewHistory.setAdapter(adapter);
+//                             Updating listview
+                            listViewHistory.setAdapter(adapter);
                         }
+//                        Response specified for updating and deleting music from music history
                         if (requestType == update_delete_music) {
-                            System.out.println(response);
                             if (response.trim().equals("Error")) {
                                 Toast.makeText(getApplicationContext(), "Error in updating database", Toast.LENGTH_LONG).show();
                             }
@@ -388,9 +410,8 @@ public class History extends AppCompatActivity {
                                         musicHistoryList.remove(i);
                                         break;
                                     }
-
                                 }
-                                ((BaseAdapter) recyclerViewHistory.getAdapter()).notifyDataSetChanged();
+                                ((BaseAdapter) listViewHistory.getAdapter()).notifyDataSetChanged();
                             }
                         }
                         if (requestType == update_device){

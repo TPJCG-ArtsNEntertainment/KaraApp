@@ -40,6 +40,8 @@ public class MainMenu extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+//         Set the ActionBar title with the activity name
+        setTitle(getClass().getSimpleName());
 
         MainMenu.this.requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},11);
 

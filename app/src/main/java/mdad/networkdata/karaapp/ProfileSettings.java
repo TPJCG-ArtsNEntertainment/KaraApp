@@ -26,7 +26,7 @@ public class ProfileSettings extends AppCompatActivity {
     EditText inputUpdateEmail, inputUpdateVerifyPassword, inputUpdatePassword, inputUpdateConfirmPassword, inputUpdateNickname;
     Button btnSubmitUpdateUser, btnCancelEdit;
     String email, verifyPassword, password, confirmPassword, nickName, uid, is_staff, username;
-    Boolean is_staffBoolean, verified;
+    Boolean is_staffBoolean;
     private final int verify_user=1, update_user=2, update_device=3;
     private static String url_verify_user = MainMenu.ipBaseAddress+"verify_userVolley.php";
     private static String url_update_user = MainMenu.ipBaseAddress+"update_userVolley.php";
@@ -36,6 +36,8 @@ public class ProfileSettings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_settings);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//         Set the ActionBar title with the activity name
+        setTitle(getClass().getSimpleName());
 
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
@@ -63,20 +65,6 @@ public class ProfileSettings extends AppCompatActivity {
                 params_verify.put("email", email);
                 params_verify.put("password", verifyPassword);
                 postData(url_verify_user, params_verify, verify_user);
-                if (verified.equals(true)){
-                    if (password.equals(confirmPassword)) {
-                        Map<String, String> params_update = new HashMap<String, String>();
-                        params_update.put("uid", uid);
-                        params_update.put("email", email);
-                        params_update.put("password", password);
-                        params_update.put("name", nickName);
-                        params_update.put("is_staff", is_staff);
-                        postData(url_update_user, params_update, update_user);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Password is not same as Confirm Password",
-                                Toast.LENGTH_LONG).show();
-                    }
-                }
             }
         });
         btnCancelEdit = (Button) findViewById(R.id.btnCancelEdit);
@@ -98,6 +86,7 @@ public class ProfileSettings extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        System.out.println(response);
                         if (requestType == verify_user) {
                             if (response.equals("Error password")) {
                                 Toast.makeText(getApplicationContext(), "Wrong password",
@@ -112,10 +101,28 @@ public class ProfileSettings extends AppCompatActivity {
                             String[] user = response.split("\\|");
                             String[] details = user[0].split(";");
 
-                            if (details.length > 1) {
-                                verified = true;
+                            if (details.length > 0) {
+                                if (password.isEmpty()){
+                                    Map<String, String> params_update = new HashMap<String, String>();
+                                    params_update.put("uid", uid);
+                                    params_update.put("email", email);
+                                    params_update.put("password", verifyPassword);
+                                    params_update.put("name", nickName);
+                                    params_update.put("is_staff", is_staff);
+                                    postData(url_update_user, params_update, update_user);
+                                }
+                                if (password.equals(confirmPassword)) {
+                                    Map<String, String> params_update = new HashMap<String, String>();
+                                    params_update.put("uid", uid);
+                                    params_update.put("email", email);
+                                    params_update.put("password", password);
+                                    params_update.put("name", nickName);
+                                    params_update.put("is_staff", is_staff);
+                                    postData(url_update_user, params_update, update_user);
+                                }
                             } else {
-                                verified = false;
+                                Toast.makeText(getApplicationContext(), "Password is not same as Confirm Password",
+                                        Toast.LENGTH_LONG).show();
                             }
                         } if (requestType == update_user){
                             if (response.equals("Error, email already exists")){
@@ -130,9 +137,10 @@ public class ProfileSettings extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Success in updating database",
                                         Toast.LENGTH_LONG).show();
                                 finish();
-                                Intent intent = new Intent(getApplicationContext(), Session.class);
+                                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                                 intent.putExtra("uid", uid);
                                 intent.putExtra("is_staff", is_staff);
+                                intent.putExtra("username", username);
                                 startActivity(intent);
                             }
                         } if (requestType == update_device){

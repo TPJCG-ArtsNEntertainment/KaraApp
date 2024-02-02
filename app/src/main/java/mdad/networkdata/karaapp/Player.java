@@ -197,10 +197,8 @@ public class Player extends Fragment implements SongChangeListener {
 
     private void getMusicFiles() {
         ContentResolver contentResolver = getActivity().getContentResolver();
-//        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Uri uri = MediaStore.Audio.Media.INTERNAL_CONTENT_URI;
-//        Cursor cursor = contentResolver.query(uri, null,MediaStore.Audio.Media.DATA+" LIKE?",new String[]{"%.mp3%"},null);
-        Cursor cursor = contentResolver.query(uri, null, null, null, null);
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor cursor = contentResolver.query(uri, null,MediaStore.Audio.Media.DATA+" LIKE?",new String[]{"%.mp3%"},null);
         if(cursor==null) {
             Toast.makeText(getActivity(),"Something went wrong!",Toast.LENGTH_SHORT).show();
         }

@@ -1,69 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-
     <ImageView
         android:id="@+id/youtubePreviewImage"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_weight="2"
         app:srcCompat="@drawable/thumbnail_placeholder" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginRight="5dp"
         android:layout_weight="1"
         android:orientation="vertical">
-
         <TextView
             android:id="@+id/mid"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:visibility="gone" />
-
         <TextView
             android:id="@+id/mName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="Song:"
             android:textAlignment="viewStart"
-            android:textColor="#000" />
-
+            android:theme="@style/Theme.KaraApp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="10sp" />
         <TextView
             android:id="@+id/mArtist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Artist: "
-            android:textAlignment="viewStart" />
-
+            android:theme="@style/Theme.KaraApp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textAlignment="viewStart"
+            android:textSize="10sp" />
         <TextView
             android:id="@+id/mUrl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Requested by:"
+            android:text="Url:"
             android:textAlignment="center"
+            android:textSize="10sp"
             android:visibility="gone" />
-
         <TextView
             android:id="@+id/mCreatedAt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Requested at:"
+            android:theme="@style/Theme.KaraApp"
+            android:textColor="?android:attr/textColorSecondary"
             android:textAlignment="viewStart"
+            android:textSize="10sp"
             android:visibility="visible" />
-
         <TextView
             android:id="@+id/mCreatedBy"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Requested by:"
+            android:theme="@style/Theme.KaraApp"
+            android:textColor="?android:attr/textColorSecondary"
             android:textAlignment="viewStart"
+            android:textSize="10sp"
             android:visibility="visible" />
-
     </LinearLayout>
-
 </LinearLayout>

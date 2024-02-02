@@ -43,12 +43,6 @@ public class Lyrics extends Fragment {
     private WebView webView;
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
-//        Intent intent = getIntent();
-//        uid = intent.getStringExtra("uid");
-//        is_staff = intent.getStringExtra("is_staff");
-//        is_staffBoolean = is_staff.equals("1");
-
         webView = view.findViewById(R.id.webView);
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -71,9 +65,4 @@ public class Lyrics extends Fragment {
         super.onSaveInstanceState(outState);
         webView.saveState(outState);
     }
-//    @Override
-//    public void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        webView.restoreState(savedInstanceState);
-//    }
 }

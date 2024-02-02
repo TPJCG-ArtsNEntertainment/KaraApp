@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/loginBanner"
         android:layout_width="match_parent"
-        android:layout_height="275dp"
+        android:layout_height="280dp"
         android:layout_gravity="center"
         app:srcCompat="@drawable/banner" />
 
@@ -22,11 +22,12 @@
 
         <TextView
             android:id="@+id/inputEmailLabel"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Email:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
 
         <EditText
             android:id="@+id/inputEmail"
@@ -35,7 +36,6 @@
             android:layout_weight="1"
             android:ems="10"
             android:inputType="textEmailAddress" />
-
     </LinearLayout>
 
     <LinearLayout
@@ -47,11 +47,12 @@
 
         <TextView
             android:id="@+id/inputPasswordLabel"
-            android:layout_width="70dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Password:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
 
         <EditText
             android:id="@+id/inputPassword"

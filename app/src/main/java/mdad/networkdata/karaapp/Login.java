@@ -34,6 +34,8 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+//         Set the ActionBar title with the activity name
+        setTitle(getClass().getSimpleName());
 
         androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -98,7 +100,7 @@ public class Login extends AppCompatActivity {
                             Intent intent = new Intent(Login.this, MainMenu.class);
                             intent.putExtra("uid", uid);
                             intent.putExtra("is_staff", is_staff);
-                            if (login_name == null) username = login_email;
+                            if (login_name.isEmpty()) username = login_email;
                             else username = login_name;
                             intent.putExtra("username", username);
                             Toast.makeText(getApplicationContext(), "Logging in to "+username,

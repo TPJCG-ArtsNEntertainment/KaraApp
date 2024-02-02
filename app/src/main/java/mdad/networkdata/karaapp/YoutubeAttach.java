@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class YoutubeAttach extends AppCompatActivity {
-    String uid,is_staff,username,mid,is_played,intent_from,attachName,attachArtist;
+    String uid,is_staff,username,intent_from_activity,mid,is_played,intent_from,attachName,attachArtist;
     Boolean is_staffBoolean;
     WebView webView;
     Button InsertLink;
@@ -40,12 +40,15 @@ public class YoutubeAttach extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_youtube_attach);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//         Set the ActionBar title with the activity name
+        setTitle(getClass().getSimpleName());
 
         Intent intent = getIntent();
         uid = intent.getStringExtra("uid");
         is_staff = intent.getStringExtra("is_staff");
         username = intent.getStringExtra("username");
         is_staffBoolean = is_staff.equals("1");
+        intent_from_activity = intent.getStringExtra("intent_from_activity");
         mid = intent.getStringExtra("mid");
         is_played = intent.getStringExtra("is_played");
         intent_from = intent.getStringExtra("intent_from");
@@ -112,6 +115,7 @@ public class YoutubeAttach extends AppCompatActivity {
                                         youtube.putExtra("uid", uid);
                                         youtube.putExtra("is_staff", is_staff);
                                         youtube.putExtra("username", username);
+                                        youtube.putExtra("intent_from_activity", intent_from_activity);
                                         youtube.putExtra("attachUrl", webView.getUrl());
                                         youtube.putExtra("attachName", attachName);
                                         youtube.putExtra("attachArtist", attachArtist);
