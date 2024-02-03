@@ -165,9 +165,8 @@ public class AddUser extends AppCompatActivity {
 //   --------------- General Functions for option menu navigation for Action Bar --------------
 //    Create Option Menu in Action Bar
     @Override
-    //add the option menu to the activity
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the option menu and display the option items when clicked;
+//        Inflate the option menu and display the option items when clicked;
         getMenuInflater().inflate(R.menu.menu_main, menu);
         String className = getClass().getSimpleName();
         String[] words = className.split("(?=[A-Z])");
@@ -178,7 +177,7 @@ public class AddUser extends AppCompatActivity {
                 item.setVisible(false);
             }
         }
-        // Non staff user should not be able navigate to user management
+//        Non staff user should not be able navigate to user management
         if (!is_staffBoolean) {
             menu.findItem(R.id.item3).setVisible(false);
         }
@@ -187,7 +186,6 @@ public class AddUser extends AppCompatActivity {
 
 //    Option Menu Item select listener
     @Override
-    //when the option item is selected
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 //         Array of menu items with their corresponding destination classes

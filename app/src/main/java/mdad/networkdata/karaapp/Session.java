@@ -59,9 +59,12 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
 public class Session extends Fragment {
+//    Initialization parameters for fragment
     private static final String ARG_PARAM1 = "param1",ARG_PARAM2 = "param2";
     private String mParam1, mParam2;
+//    Empty public constructor for fragment
     public Session(){};
+//    Create new instance of fragment with this method with parameters
     public static Session newInstance(String param1, String param2) {
         Session session = new Session();
         Bundle args = new Bundle();
@@ -85,34 +88,38 @@ public class Session extends Fragment {
         return inflater.inflate(R.layout.activity_session, container, false);
     }
 
-    private static String url_all_queue_musics = MainMenu.ipBaseAddress+"get_all_musicQueueVolley.php";
-    private static String url_update_music = MainMenu.ipBaseAddress+"update_musicVolley.php";
-    private static String url_delete_music = MainMenu.ipBaseAddress+"delete_musicVolley.php";
-    private static String url_get_power = MainMenu.ipBaseAddress+"get_powerVolley.php";
-    private static String url_update_power = MainMenu.ipBaseAddress+"update_powerVolley.php";
+//    ------ Beginning of fragment customization ------
+//    Declaration of String for selected item and Boolean for fullscreen and power status
+    private String selectedMusicId, selectedMusicName, selectedMusicArtist, selectedMusicUrl, selectedMusicCreatedBy;
+    private boolean isFullscreen = false, power;
+//    Declaration of components from Session's xml
     private Button btnAddMusic, btnPower;
     private YouTubePlayer youTubePlayer;
     private ListView listView;
     private SearchView queueSearchView;
     private ImageView closedSessionImage;
     private TextView closedSessionLabel;
-    private boolean isFullscreen = false, power;
-    private String selectedMusicId, selectedMusicName, selectedMusicArtist, selectedMusicUrl, selectedMusicCreatedBy;
-    private final int get_all_queue_music = 1, update_delete_music =2, get_power=3, update_power=4;
+//    Declaration of Array for music list and filter
     private ArrayList<HashMap<String, String>> musicsList, originalMusicsList,filteredMusicsList,targetList;
-
+//    Declaration of Url address for postData
+    private static String url_all_queue_musics = MainMenu.ipBaseAddress+"get_all_musicQueueVolley.php";
+    private static String url_update_music = MainMenu.ipBaseAddress+"update_musicVolley.php";
+    private static String url_delete_music = MainMenu.ipBaseAddress+"delete_musicVolley.php";
+    private static String url_get_power = MainMenu.ipBaseAddress+"get_powerVolley.php";
+    private static String url_update_power = MainMenu.ipBaseAddress+"update_powerVolley.php";
+    private final int get_all_queue_music = 1, update_delete_music =2, get_power=3, update_power=4;
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        // get resource id of ListView
-        listView = (ListView)view.findViewById(R.id.listViewQueue);
+//         Declaration of ListView
+        listView = view.findViewById(R.id.listViewQueue);
         registerForContextMenu(listView);
-        // ArrayList to store product info in Hashmap for ListView
+//         ArrayList to store music info in Hashmap for ListView
         musicsList = new ArrayList<HashMap<String, String>>();
-        // re-usable method to use Volley to retrieve products from database
+//         Perform postData to update ListView
         postData(url_all_queue_musics, null, get_all_queue_music);
 
-        queueSearchView = view.findViewById(R.id.queueSearchView);
+//        Get original ListAdapter from ListView's musicHistoryList
         ListAdapter originalAdapter = new SimpleAdapter(
                 requireActivity(), musicsList,
                 R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"},
@@ -121,6 +128,9 @@ public class Session extends Fragment {
         originalMusicsList = musicsList;
         filteredMusicsList = new ArrayList<>(originalMusicsList);
         listView.setAdapter(originalAdapter);
+
+//        Declaration of Search bar, query tide to update ListView with filter
+        queueSearchView = view.findViewById(R.id.queueSearchView);
         queueSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -135,7 +145,8 @@ public class Session extends Fragment {
             }
         });
 
-        btnAddMusic = (Button) view.findViewById(R.id.btnQueueAdd);
+//        Button Add Music to navigate to AddMusic Page
+        btnAddMusic = view.findViewById(R.id.btnQueueAdd);
         btnAddMusic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,28 +160,33 @@ public class Session extends Fragment {
             }
         });
 
-//      Power Logic
+//      -------- Power Logic (General purpose to stop participant add music into queue when event end)-------
+//        Retrieve power status (Database control)
         postData(url_get_power,null, get_power);
-        closedSessionImage = (ImageView) view.findViewById(R.id.closedSessionImage);
-        closedSessionLabel = (TextView) view.findViewById(R.id.closedSessionLabel);
-        btnPower = (Button) view.findViewById(R.id.btnPower);
+//        Declaration of display for closed session and power button
+        closedSessionImage = view.findViewById(R.id.closedSessionImage);
+        closedSessionLabel = view.findViewById(R.id.closedSessionLabel);
+        btnPower = view.findViewById(R.id.btnPower);
         btnPower.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Map<String, String> param_update = new HashMap<String, String>();
-                // Toggle the power state
+//                 Toggle the power state
                 int newPowerState = power ? 0 : 1;
                 param_update.put("power_state", String.valueOf(newPowerState));
                 postData(url_update_power, param_update, update_power);
             }
         });
+//        Non staff user should not be able to toggle power button
         if(!MainMenu.is_staffBoolean){
             btnPower.setVisibility(View.GONE);
         }
 //        End of Power Logic
 
-//        YoutubePlayer Logic
+//        --------Start of YoutubePlayer Logic---------
+//        Customize back button callback to exit fullscreen
         requireActivity().getOnBackPressedDispatcher().addCallback(requireActivity(), onBackPressedCallback);
+//        Declaration of each layers for Youtube Player layouts
         YouTubePlayerView youTubePlayerView = view.findViewById(R.id.mainPageYoutubePlayer);
         LinearLayout linearLayout = view.findViewById(R.id.mainPageLinearLayout);
         FrameLayout fullscreenViewContainer = view.findViewById(R.id.mainPageFullScreenViewContainer);
@@ -179,16 +195,21 @@ public class Session extends Fragment {
                 .controls(1)
                 .fullscreen(1)
                 .build();
+//        Disable auto initialization as we will customize initialization
         youTubePlayerView.setEnableAutomaticInitialization(false);
+//        Youtube player fullscreen listener
         youTubePlayerView.addFullscreenListener(new FullscreenListener() {
+//            -------- On Entering Fulllscreen----------
             @Override
             public void onEnterFullscreen(View fullscreenView, Function0<Unit> exitFullscreen) {
+//                Hide components upon Fullscreen and unhide fullscreen container
                 isFullscreen = true;
                 youTubePlayerView.setVisibility(View.GONE);
                 linearLayout.setVisibility(View.GONE);
                 tabLayout.setVisibility(View.GONE);
                 fullscreenViewContainer.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.addView(fullscreenView);
+//                Hide Action Bar upon fullscreen
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     Window window = requireActivity().getWindow();
                     window.setDecorFitsSystemWindows(false);
@@ -199,18 +220,22 @@ public class Session extends Fragment {
                         actionBar.hide();
                     }
                 }
+//                Hide Notification bar on Android
                 View decorView = requireActivity().getWindow().getDecorView();
                 int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
                 decorView.setSystemUiVisibility(uiOptions);
             }
+//            -------------- On Exit Fullscreen --------------
             @Override
             public void onExitFullscreen() {
+//                Unhide components upon Fullscreen and hide fullscreen container
                 isFullscreen = false;
                 youTubePlayerView.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.VISIBLE);
                 tabLayout.setVisibility(View.VISIBLE);
                 fullscreenViewContainer.setVisibility(View.GONE);
                 fullscreenViewContainer.removeAllViews();
+//                Show Action Bar upon fullscreen
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     Window window = requireActivity().getWindow();
                     window.setDecorFitsSystemWindows(true);
@@ -221,11 +246,13 @@ public class Session extends Fragment {
                         actionBar.show();
                     }
                 }
+//                Show Notification bar on Android
                 View decorView = requireActivity().getWindow().getDecorView();
                 int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
                 decorView.setSystemUiVisibility(uiOptions);
             }
         });
+//        Customize initialization of Youtube Player
         youTubePlayerView.initialize(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(YouTubePlayer youTubePlayer) {
@@ -239,45 +266,82 @@ public class Session extends Fragment {
             }
         }, iFramePlayerOptions);
         getLifecycle().addObserver(youTubePlayerView);
-//        End of Youtube Player Logic
+//        ---------End of Youtube Player Logic--------
     }
+
+//    --------- Dynamic function to extract Video Id from Youtube URL ---------
+    public String extractVideoId(String url) {
+        String videoId = "";
+        try {
+            // Regular expression pattern to match YouTube video IDs
+            Pattern pattern = Pattern.compile("^.*(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|&v=)([^#&?]*).*");
+            Matcher matcher = pattern.matcher(url);
+            if (matcher.matches() && matcher.group(2).length() == 11) {
+                videoId = matcher.group(2);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return videoId;
+    }
+
+//    ---------- Function to customize Android back button upon fullscreen ----------
+    private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            if (isFullscreen) {
+                youTubePlayer.toggleFullscreen();
+            }
+        }
+    };
+
+
+//    --------------- General Functions for context menu navigation for ListView item --------------
+//    Create Context Menu in ListView Item
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
+//        Inflate the context menu and display context menu when item long pressed
         requireActivity().getMenuInflater().inflate(R.menu.menu_music, menu);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+//        Retrieve selected item data into HashMap
         HashMap<String, String> rowData = musicsList.get(info.position);
         Boolean is_owner = MainMenu.username.equals(rowData.get("created_by"));
         menu.findItem(R.id.option_set_unplayed).setVisible(false);
-
+//        Privilege for staff to control music list
         if (!MainMenu.is_staffBoolean) {
             menu.findItem(R.id.option_set_played).setVisible(false);
             menu.findItem(R.id.option_edit).setVisible(false);
             menu.findItem(R.id.option_remove).setVisible(false);
         }
+//        Privilege for item created owner (Only apply if created_by is same as logged in user)
         if (is_owner){
             menu.findItem(R.id.option_edit).setVisible(true);
             menu.findItem(R.id.option_remove).setVisible(true);
         }
     }
+
+//    Context Menu Item select listener
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
+//        Retrieve information from selected item
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+//        Set targetList based on filter status
         if (filteredMusicsList.isEmpty()) targetList = musicsList;
         else targetList = filteredMusicsList;
+//        Retrieve selected item data into HashMap and variables
         HashMap<String, String> rowData = targetList.get(info.position);
         selectedMusicId = rowData.get("music_id");
         selectedMusicName = rowData.get("music_name");
         selectedMusicArtist = rowData.get("artist_name");
         selectedMusicUrl = rowData.get("url");
         selectedMusicCreatedBy = rowData.get("created_by");
+//        Handling each contextItem option selection
         int itemId = item.getItemId();
         if (itemId == R.id.option_play) {
             String videoId = extractVideoId(selectedMusicUrl);
             youTubePlayer.loadVideo(videoId,1);
             Toast.makeText(requireActivity(), "Playing: " + selectedMusicName, Toast.LENGTH_SHORT).show();
-//        } else if (itemId == R.id.option_download_video) {
-//        } else if (itemId == R.id.option_download_music) {
         } else if (itemId == R.id.option_set_played) {
             Map<String, String> params_update = new HashMap<String, String>();
             params_update.put("mid", selectedMusicId);
@@ -314,13 +378,15 @@ public class Session extends Fragment {
         return true;
     }
 
+//  ------------- General function apply for Search bar to the corresponding List----------
     private void filter(String query) {
+//        Initialize filter list
         filteredMusicsList.clear();
         if (TextUtils.isEmpty(query)) {
-            // If the query is empty, show all items
+//            If the query is empty, show all items
             filteredMusicsList.addAll(originalMusicsList);
         } else {
-            // Filter items based on the query
+//            Filter items based on the query
             for (HashMap<String, String> music : originalMusicsList) {
                 if (music.get("music_name").toLowerCase().contains(query.toLowerCase())) {
                     filteredMusicsList.add(music);
@@ -333,12 +399,13 @@ public class Session extends Fragment {
                 }
             }
         }
-        // Update the adapter with the filtered data
+//        Update the adapter with the filtered data
         ListAdapter filteredAdapter = new SimpleAdapter(
                 requireActivity(), filteredMusicsList,
                 R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"},
                 new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
         ){
+//            Using Picasso to display preview image with youtube video ID
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
@@ -353,27 +420,30 @@ public class Session extends Fragment {
         listView.setAdapter(filteredAdapter);
     }
 
+//    ---------- PostData Volley Function ----------
     public void postData(String url, Map params, final int requestType) {
-        //create a RequestQueue for Volley
+//        Declaration of volley request
         RequestQueue requestQueue = Volley.newRequestQueue(requireActivity());
-        //create a StringRequest for Volley for HTTP Post
+//        Declaration of string request for post parameters
         StringRequest stringRequest = new StringRequest( Request.Method.POST, url,
-                //response from server
+//                Upon receiving response, actions to be done.
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+//                        Response specified for retrieve all music queue response
                         if (requestType == get_all_queue_music) {
-                            //check if error code received from server.
+//                            check if error code received from server.
                             if (response.equals("Error")) {
                                 Toast.makeText(requireActivity(), "Error in retrieving database", Toast.LENGTH_LONG).show();
                                 return;
                             }
-                            //handle the response data received from server
-                            //store each product from database records in String array
+//                            Clear musicList
+                            musicsList.clear();
+//                            store each music from database in String array
                             String[] musics = response.split("\\|");
-                            // for each product, retrieve the music details
+//                             for each music, retrieve the music details
                             for (int i = 0; i < musics.length; i++) {
-                                // Storing each product info in variable
+//                                 Storing each music info in variable
                                 String[] details = musics[i].split(";");
                                 String mid = details[0];
                                 String musicName = details[1];
@@ -382,9 +452,8 @@ public class Session extends Fragment {
                                 String created_at = details[4];
                                 String created_by = details[5];
 
-                                // creating new HashMap
+                                // HashMap for each music details
                                 HashMap<String, String> map = new HashMap<String, String>();
-                                // adding each product info to HashMap key-value pair
                                 map.put("music_id", mid);
                                 map.put("music_name", musicName);
                                 map.put("artist_name", artistName);
@@ -395,11 +464,12 @@ public class Session extends Fragment {
                                 // adding map HashList to ArrayList
                                 musicsList.add(map);
                             }
-                            //populate the listview with product information from Hashmap
+//                            populate the listview with music information from Hashmap
                             ListAdapter adapter = new SimpleAdapter(
                                             requireActivity(), musicsList,
                                             R.layout.list_view_musics, new String[]{"music_id", "music_name", "url", "artist_name", "created_at", "created_by"}, new int[]{R.id.mid, R.id.mName, R.id.mUrl, R.id.mArtist, R.id.mCreatedBy, R.id.mCreatedAt}
                                     ){
+//                                      Using Picasso to display preview image with youtube video ID
                                     @Override
                                     public View getView(int position, View convertView, ViewGroup parent) {
                                         View view = super.getView(position, convertView, parent);
@@ -411,9 +481,10 @@ public class Session extends Fragment {
                                         return view;
                                     }
                                 };
-                            // updating listview
+//                             Updating listview
                             listView.setAdapter(adapter);
                         }
+//                        Response specified for updating and deleting music from music history
                         if (requestType == update_delete_music) {
                             if (response.trim().equals("Error")) {
                                 Toast.makeText(requireActivity(), "Error in updating database", Toast.LENGTH_LONG).show();
@@ -429,19 +500,27 @@ public class Session extends Fragment {
                                     }
 
                                 }
+//                                Refresh music queue list
+                                postData(url_all_queue_musics, null, get_all_queue_music);
                                 ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
                             }
                         }
+//                        Response specified for retrieving power status
                         if (requestType == get_power){
+//                            Handle error in php
                             if (response.equals(" Error")) {
                                 Toast.makeText(requireActivity(), "Error in retrieving database", Toast.LENGTH_LONG).show();
                             }
-                            power = response.equals("1");
+//                            Handle boolean power status
+                            power = response.equals("1"); //convert response from string to boolean
                             if (!power){
+//                                Hide closed session display and show listview
                                 closedSessionImage.setVisibility(View.GONE);
                                 closedSessionLabel.setVisibility(View.GONE);
                                 listView.setVisibility(View.VISIBLE);
+//                                Set Button click availability and color
                                 btnAddMusic.setClickable(true);
+//                                Using TypedValue to retrieve hex code of the color theme from theme.xml
                                 TypedValue typedValue = new TypedValue();
                                 requireActivity().getTheme().resolveAttribute(com.google.android.material.R.attr.colorPrimary, typedValue, true);
                                 int colorPrimary = ContextCompat.getColor(requireActivity(), typedValue.resourceId);
@@ -449,26 +528,32 @@ public class Session extends Fragment {
                                 btnPower.setBackgroundColor(0xFFFF0000);
                             }
                             if (power) {
+//                                Show closed session display and hide listview
                                 listView.setVisibility(View.GONE);
                                 closedSessionImage.setVisibility(View.VISIBLE);
                                 closedSessionLabel.setVisibility(View.VISIBLE);
+//                                Set Button click availability and color
                                 btnAddMusic.setClickable(false);
                                 btnAddMusic.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                                 btnPower.setBackgroundColor(0xFF4CAF50);
                             }
                         }
+//                        Response specified for updating power status
                         if (requestType == update_power){
+//                            Handling error from php
                             if (response.equals("Error")) {
                                 Toast.makeText(requireActivity(), "Error in updating database", Toast.LENGTH_LONG).show();
                             }
+//                            Handling success updating power status
                             if (response.equals("Success")) {
                                 Toast.makeText(requireActivity(), "Success in updating database", Toast.LENGTH_LONG).show();
+//                                Refresh power status
                                 postData(url_get_power,null,get_power);
                             }
                         }
                     }
                 },
-                //error in Volley
+//                    Error Listener if Volley failed to fetch data with database
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
@@ -480,34 +565,10 @@ public class Session extends Fragment {
             @Nullable
             @Override
             protected Map<String, String> getParams() {
-                //send mid stored in HashMap using HTTP Post in Volley
                 return params;
             }
         };
-        //add StringRequest to RequestQueue in Volley
+//        perform Volley Request
         requestQueue.add(stringRequest);
     }
-
-    public String extractVideoId(String url) {
-        String videoId = "";
-        try {
-            // Regular expression pattern to match YouTube video IDs
-            Pattern pattern = Pattern.compile("^.*(youtu.be\\/|v\\/|u\\/\\w\\/|embed\\/|watch\\?v=|&v=)([^#&?]*).*");
-            Matcher matcher = pattern.matcher(url);
-            if (matcher.matches() && matcher.group(2).length() == 11) {
-                videoId = matcher.group(2);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return videoId;
-    }
-    private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
-        @Override
-        public void handleOnBackPressed() {
-            if (isFullscreen) {
-                youTubePlayer.toggleFullscreen();
-            }
-        }
-    };
 }

@@ -282,9 +282,9 @@ public class EditMusic extends AppCompatActivity {
                             }
                             if (response.trim().equals("Success")) {
                                 Toast.makeText(getApplicationContext(), "Success in updating database", Toast.LENGTH_LONG).show();
-//                                Upon Success, navigate back to User Management
+//                                Upon Success, navigate back to MainMenu
                                 finish();
-                                Intent intent = new Intent(getApplicationContext(), Session.class);
+                                Intent intent = new Intent(getApplicationContext(), MainMenu.class);
                                 intent.putExtra("uid", uid);
                                 intent.putExtra("is_staff", is_staff);
                                 intent.putExtra("username", username);

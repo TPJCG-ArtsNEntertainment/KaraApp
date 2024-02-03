@@ -111,7 +111,7 @@ public class AddMusic extends AppCompatActivity {
                 musicName = inputMusic.getText().toString();
                 musicArtist = inputArtist.getText().toString();
                 musicUrl = inputUrl.getText().toString();
-                musicCreatedBy = MainMenu.username;
+                musicCreatedBy = username;
 //                Music Name and Music Url inputs are compulsory
                 if (musicName.isEmpty()) {
                     Toast.makeText(getApplicationContext(), "No fields must be empty",
@@ -284,9 +284,6 @@ public class AddMusic extends AppCompatActivity {
                                     intent.putExtra("username", username);
                                     startActivity(intent);
                                 }
-
-
-
                             }
                         }
 //                        Response specified for updating device if user log out
