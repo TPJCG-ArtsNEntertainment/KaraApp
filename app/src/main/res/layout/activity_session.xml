@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".KaraSession">
+    tools:context=".Session">
 
     <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
         android:id="@+id/mainPageYoutubePlayer"
@@ -35,31 +35,39 @@
         app:layout_constraintTop_toBottomOf="@+id/mainPageYoutubePlayer">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:background="@color/black_200"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btnJump"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="5dp"
-                android:text="Jump To Queue" />
+            <SearchView
+                android:id="@+id/queueSearchView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:maxWidth="300dp"
+                android:minWidth="300dp" />
 
             <Button
                 android:id="@+id/btnPower"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginHorizontal="5dp"
-                android:text="Off" />
+                app:icon="@drawable/baseline_power_settings_new_24"
+                app:iconGravity="textEnd"
+                app:iconPadding="1dp"
+                app:iconTint="#FFFFFF" />
 
             <Button
                 android:id="@+id/btnQueueAdd"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginHorizontal="5dp"
-                android:text="Add Music" />
+                app:icon="@drawable/baseline_add_24"
+                app:iconGravity="textEnd"
+                app:iconPadding="1dp"
+                app:iconTint="#FFFFFF" />
 
         </LinearLayout>
 
@@ -84,38 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:visibility="gone"/>
-
-        <LinearLayout
-            android:id="@+id/mainPageButtonLinearLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/btnQueueEdit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="20dp"
-                android:text="Edit" />
-
-            <Button
-                android:id="@+id/btnSetPlayed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="20dp"
-                android:text="Played" />
-
-            <Button
-                android:id="@+id/btnQueueRemove"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginHorizontal="20dp"
-                android:text="Remove" />
-        </LinearLayout>
+            android:longClickable="true"
+            android:visibility="gone" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

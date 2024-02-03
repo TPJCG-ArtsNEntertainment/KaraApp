@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer border -->
+    <item>
+        <shape>
+            <solid android:color="?attr/colorOnPrimary" />
+            <stroke
+                android:width="3dp"
+                android:color="?android:attr/textColorPrimary" />
+            <corners android:radius="10dp" />
+        </shape>
+    </item>
+    <!-- Inner border (InsetDrawable to create the gap) -->
+    <item android:left="5dp" android:top="5dp" android:right="5dp" android:bottom="5dp">
+        <inset xmlns:android="http://schemas.android.com/apk/res/android">
+            <shape>
+                <solid android:color="@android:color/transparent" />
+                <stroke
+                    android:width="3dp"
+                    android:color="?android:attr/textColorPrimary" />
+                <padding
+                    android:left="2dp"
+                    android:top="2dp"
+                    android:right="2dp"
+                    android:bottom="2dp" />
+            </shape>
+        </inset>
+    </item>
+</layer-list>

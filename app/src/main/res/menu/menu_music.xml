@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/option_play"
+        android:title="Play"/>
+    <item
+        android:id="@+id/option_download_video"
+        android:title="Download Video"/>
+    <item
+        android:id="@+id/option_download_music"
+        android:title="Download Music"/>
+    <item
+        android:id="@+id/option_set_played"
+        android:title="Set Played"/>
+    <item
+        android:id="@+id/option_set_unplayed"
+        android:title="Set unPlayed"/>
+    <item
+        android:id="@+id/option_edit"
+        android:title="Edit"/>
+    <item
+        android:id="@+id/option_remove"
+        android:title="Remove"/>
+</menu>

@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Email:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
 
         <EditText
             android:id="@+id/inputUpdateEmail"
@@ -41,7 +42,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Old Password:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
         <EditText
             android:id="@+id/inputUpdateVerifyPassword"
             android:layout_width="wrap_content"
@@ -65,13 +67,16 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="New Password:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
+
         <EditText
             android:id="@+id/inputUpdatePassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
+            android:hint="(optional)"
             android:inputType="textPassword" />
 
     </LinearLayout>
@@ -89,13 +94,16 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Confirm Password:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
+
         <EditText
             android:id="@+id/inputUpdateConfirmPassword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
+            android:hint="(optional)"
             android:inputType="textPassword" />
     </LinearLayout>
 
@@ -111,14 +119,18 @@
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:hint="(optional)"
             android:text="NickName:"
-            android:textAlignment="textEnd" />
+            android:textAlignment="textEnd"
+            android:textSize="12sp" />
+
         <EditText
             android:id="@+id/inputUpdateNickName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
+            android:hint="(optional)"
             android:inputType="text" />
     </LinearLayout>
 
