@@ -6,6 +6,8 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -29,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -57,6 +60,8 @@ public class Player extends Fragment implements SongChangeListener
     private Timer timer;
     private MusicAdapter musicAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean isUserInteractingWithSeekBar = false;
+
 
     private int currentSongListPosition=0;
     private static final String ARG_PARAM1 = "param1",ARG_PARAM2 = "param2";
@@ -89,6 +94,10 @@ public class Player extends Fragment implements SongChangeListener
 
 
 
+
+
+
+
     }
 
 
@@ -105,15 +114,15 @@ public class Player extends Fragment implements SongChangeListener
     {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.activity_player, container, false);
+
     }
 
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
 
-        super.onViewCreated(view, savedInstanceState);
 
-        Activity activity = getActivity();
+
 
 //        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 //        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -121,13 +130,17 @@ public class Player extends Fragment implements SongChangeListener
 //            public void onRefresh() {
 
 
-        //Hides Status Bar and Navigation
-        if (activity != null)
-        {
-            View decodeView = activity.getWindow().getDecorView();
-            int options =  View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            decodeView.setSystemUiVisibility(options);
-        }
+
+
+
+
+//        //Hides Status Bar and Navigation
+//        if (activity != null)
+//        {
+//            View decodeView = activity.getWindow().getDecorView();
+//            int options =  View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+//            decodeView.setSystemUiVisibility(options);
+//        }
 
 
         musicRecyclerView = view.findViewById(R.id.musicRecyclerView);
@@ -136,6 +149,8 @@ public class Player extends Fragment implements SongChangeListener
 
         final ImageView nextBtn = view.findViewById(R.id.nextBtn);
         final ImageView previousBtn = view.findViewById(R.id.previousBtn);
+
+        Button playlist = view.findViewById(R.id.btnPlaylist);
 
         startTime= view.findViewById(R.id.startTime);
         endTime=view.findViewById(R.id.endTime);
@@ -146,21 +161,15 @@ public class Player extends Fragment implements SongChangeListener
         mediaPlayer=new MediaPlayer();
 
         if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED)
-        {
-            getMusicFiles();
-
-        }
+        {getMusicFiles();}
         else
         {
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M)
             {
                 ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},11);
             }
-            else {
-                getMusicFiles();
-
-            }
-
+            else
+            {getMusicFiles();}
         }
 
         playPauseCard.setOnClickListener(new View.OnClickListener()
@@ -179,9 +188,7 @@ public class Player extends Fragment implements SongChangeListener
                     isPlaying=true;
                     mediaPlayer.start();
                     playPauseImg.setImageResource(R.drawable.pause_btn);
-
                 }
-
             }
         });
 
@@ -195,14 +202,25 @@ public class Player extends Fragment implements SongChangeListener
                 if(nextSongListPosition>=musicLists.size())
                 {
                     nextSongListPosition=0;
+
                 }
 
-                musicLists.get(currentSongListPosition).setPlaying(false);
-                musicLists.get(nextSongListPosition).setPlaying(true);
+                if(musicLists.size() == 0)
+                {
+                    Toast.makeText(getActivity(),"No music in list",Toast.LENGTH_SHORT).show();
+                }
 
-                musicAdapter.updateList(musicLists);
-                musicRecyclerView.scrollToPosition(nextSongListPosition);
-                onChanged(nextSongListPosition);
+                else
+                {
+
+                    musicLists.get(currentSongListPosition).setPlaying(false);
+                    musicLists.get(nextSongListPosition).setPlaying(true);
+
+                    musicAdapter.updateList(musicLists);
+                    musicRecyclerView.scrollToPosition(nextSongListPosition);
+                    onChanged(nextSongListPosition);
+                }
+
 
 
 
@@ -214,7 +232,6 @@ public class Player extends Fragment implements SongChangeListener
             @Override
             public void onClick(View v)
             {
-
                 int prevSongListPosition= currentSongListPosition-1;
 
                 if(prevSongListPosition<0)
@@ -222,15 +239,22 @@ public class Player extends Fragment implements SongChangeListener
                     prevSongListPosition=musicLists.size()-1;//play last song
                 }
 
-                musicLists.get(currentSongListPosition).setPlaying(false);
-                musicLists.get(prevSongListPosition).setPlaying(true);
 
-                musicAdapter.updateList(musicLists);
-                musicRecyclerView.scrollToPosition(prevSongListPosition);
-                onChanged(prevSongListPosition);
+                if(musicLists.size() == 0)
+                {
+                    Toast.makeText(getActivity(),"No music in list",Toast.LENGTH_SHORT).show();
+                }
 
+                else
+                {
 
+                    musicLists.get(currentSongListPosition).setPlaying(false);
+                    musicLists.get(prevSongListPosition).setPlaying(true);
 
+                    musicAdapter.updateList(musicLists);
+                    musicRecyclerView.scrollToPosition(prevSongListPosition);
+                    onChanged(prevSongListPosition);
+                }
             }
 
             });
@@ -242,6 +266,8 @@ public class Player extends Fragment implements SongChangeListener
             {
                 if(fromUser)
                 {
+                    isUserInteractingWithSeekBar = true;
+
                     if(isPlaying)
                     {
                         mediaPlayer.seekTo(progress);
@@ -251,18 +277,22 @@ public class Player extends Fragment implements SongChangeListener
                         mediaPlayer.seekTo(0);
                     }
                 }
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar)
-            {
+
+
 
             }
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar)
-            {
 
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                isUserInteractingWithSeekBar = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                isUserInteractingWithSeekBar = false;
             }
         });
 
@@ -281,9 +311,35 @@ public class Player extends Fragment implements SongChangeListener
 
         // Trigger a refresh when the activity starts
 
+        playlist.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                replaceFragmentWithAnother();
+            }
+        });
 
 
 
+
+
+
+
+
+
+    }
+    public void replaceFragmentWithAnother()
+    {
+        MusicPlaylist anotherFragment = new MusicPlaylist();
+
+        // Begin the transaction
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+
+        // Replace whatever is in the container view with this fragment
+        transaction.replace(R.id.fragment_container, anotherFragment);
+
+        // Commit the transaction
+        transaction.commit();
     }
 
 
@@ -349,6 +405,7 @@ public class Player extends Fragment implements SongChangeListener
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults.length> 0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
         {
             getMusicFiles();
@@ -439,17 +496,55 @@ public class Player extends Fragment implements SongChangeListener
 
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
-                    public void onCompletion(MediaPlayer mp)
-                    {
-                        mediaPlayer.reset();
+                    public void onCompletion(MediaPlayer mp) {
+                        if (!isUserInteractingWithSeekBar)
+                        {
 
-                        timer.purge();
-                        timer.cancel();
 
-                        isPlaying=false;
-                        playPauseImg.setImageResource(R.drawable.play_icon);
-                        playerSeekBar.setProgress(0);
 
+                            mediaPlayer.reset();
+
+                            timer.purge();
+                            timer.cancel();
+
+                            isPlaying = false;
+                            playPauseImg.setImageResource(R.drawable.play_icon);
+                            playerSeekBar.setProgress(0);
+                            currentSongListPosition++;
+
+
+                            musicAdapter.updateList(musicLists);
+                            musicRecyclerView.scrollToPosition(currentSongListPosition);
+
+
+                            if (currentSongListPosition < musicLists.size()) {
+                                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            if (isAdded()) {
+                                                mediaPlayer.setDataSource(getActivity(), musicLists.get(currentSongListPosition).getMusicFile());
+                                                mediaPlayer.prepare();
+                                                mediaPlayer.start();
+
+
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                            if (isAdded()) {
+                                                Toast.makeText(getActivity(), "Unable to play track", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }
+                                }).start();
+                            } else {
+                                // Reset the current song position if we've reached the end of the list
+                                currentSongListPosition = 0;
+                            }
+
+
+                        }
                     }
                 });
 
