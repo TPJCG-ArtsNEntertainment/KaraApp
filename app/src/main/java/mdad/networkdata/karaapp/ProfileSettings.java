@@ -69,7 +69,7 @@ public class ProfileSettings extends AppCompatActivity {
                 email = inputUpdateEmail.getText().toString();
                 verifyPassword = inputUpdateVerifyPassword.getText().toString();
                 password = inputUpdatePassword.getText().toString();
-                confirmPassword = inputUpdateVerifyPassword.getText().toString();
+                confirmPassword = inputUpdateConfirmPassword.getText().toString();
                 nickName = inputUpdateNickname.getText().toString();
 //                Store inputs into Map parameter to perform postData on verify with update
                 Map<String, String> params_verify = new HashMap<String, String>();
@@ -124,16 +124,15 @@ public class ProfileSettings extends AppCompatActivity {
 //                            Ensure user result received
                             if (details.length > 0) {
 //                                If user is not updating their password
-                                if (password.isEmpty()){
+                                if (password.isEmpty()) {
                                     Map<String, String> params_update = new HashMap<String, String>();
                                     params_update.put("uid", uid);
                                     params_update.put("email", email);
                                     params_update.put("name", nickName);
                                     params_update.put("is_staff", is_staff);
                                     postData(url_update_user, params_update, update_user);
-                                }
 //                                If user is updating their password check password match confirmPassword
-                                if (password.equals(confirmPassword)) {
+                                } else if (password.equals(confirmPassword)) {
                                     Map<String, String> params_update = new HashMap<String, String>();
                                     params_update.put("uid", uid);
                                     params_update.put("email", email);
@@ -141,8 +140,11 @@ public class ProfileSettings extends AppCompatActivity {
                                     params_update.put("name", nickName);
                                     params_update.put("is_staff", is_staff);
                                     postData(url_update_user, params_update, update_user);
-                                } else {
+                                } else if (!password.equals(confirmPassword)) {
                                     Toast.makeText(getApplicationContext(), "Password is not same as Confirm Password",
+                                            Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "Error updating password",
                                             Toast.LENGTH_LONG).show();
                                 }
                             }
