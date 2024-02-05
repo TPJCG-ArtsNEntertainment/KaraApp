@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-
-
-
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,6 +8,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Player">
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+
     
     
     <RelativeLayout
@@ -19,6 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/purple_200">
+
+
         <LinearLayout
             android:id="@+id/searchBtn"
             android:layout_marginStart="20dp"
@@ -58,17 +65,53 @@
         </LinearLayout>
     </RelativeLayout>
 
+
+
+
+    <RelativeLayout
+        android:id="@+id/Buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/topBar"
+        android:orientation="horizontal"
+        android:minHeight="50dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="50dp">
+        <Button
+            android:id="@+id/btnPlaylist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Playlist" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="50dp">
+        <Button
+            android:id="@+id/btnBrowse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Browse" />
+        </LinearLayout>
+    </RelativeLayout>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomBar"
-        android:layout_below="@id/topBar">
+        android:layout_below="@id/Buttons">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/musicRecyclerView"
-        android:layout_marginBottom="0dp"
+        android:layout_marginBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomBar"
@@ -92,7 +135,7 @@
             android:layout_marginStart="10dp"
             android:textSize="12sp"
             android:layout_centerVertical="true"
-            android:textColor="#000000"
+            android:textColor="@color/purple_200"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00:00"/>
@@ -115,7 +158,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
             android:textSize="12sp"
-            android:textColor="#000000"
+            android:textColor="@color/purple_200"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00:00"/>
@@ -176,5 +219,6 @@
 
         
 </RelativeLayout>
+
 
 

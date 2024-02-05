@@ -5,6 +5,8 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -25,6 +27,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -49,6 +52,9 @@ public class Player extends Fragment implements SongChangeListener {
     private Timer timer;
     private MusicAdapter musicAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean isUserInteractingWithSeekBar = false;
+
+
     private int currentSongListPosition=0;
     private static final String ARG_PARAM1 = "param1",ARG_PARAM2 = "param2";
     private String mParam1, mParam2;
@@ -68,33 +74,63 @@ public class Player extends Fragment implements SongChangeListener {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
+
+
+
+
+
     }
+
+
+
+
+
+
+
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.activity_player, container, false);
+
     }
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Activity activity = getActivity();
+
+
+
+
 //        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 //        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 //            @Override
 //            public void onRefresh() {
-        //Hides Status Bar and Navigation
-        if (activity != null) {
-            View decodeView = activity.getWindow().getDecorView();
-            int options =  View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            decodeView.setSystemUiVisibility(options);
-        }
+
+
+
+
+
+
+//        //Hides Status Bar and Navigation
+//        if (activity != null)
+//        {
+//            View decodeView = activity.getWindow().getDecorView();
+//            int options =  View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+//            decodeView.setSystemUiVisibility(options);
+//        }
+
+
         musicRecyclerView = view.findViewById(R.id.musicRecyclerView);
         final CardView playPauseCard = view.findViewById(R.id.playPauseCard);
         playPauseImg= view.findViewById(R.id.playPauseImg);
 
         final ImageView nextBtn = view.findViewById(R.id.nextBtn);
         final ImageView previousBtn = view.findViewById(R.id.previousBtn);
+
+        Button playlist = view.findViewById(R.id.btnPlaylist);
 
         startTime= view.findViewById(R.id.startTime);
         endTime=view.findViewById(R.id.endTime);
@@ -105,19 +141,17 @@ public class Player extends Fragment implements SongChangeListener {
         mediaPlayer=new MediaPlayer();
 
         if(ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED)
+        {getMusicFiles();}
+        else
         {
-            System.out.println("Test1");
-            getMusicFiles();
-        } else {
-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M) {
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M)
+            {
                 ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},11);
                 System.out.println("Test2");
                 getMusicFiles();
             }
-            else {
-                System.out.println("Test3");
-                getMusicFiles();
-            }
+            else
+            {getMusicFiles();}
         }
 
         playPauseCard.setOnClickListener(new View.OnClickListener() {
@@ -142,58 +176,141 @@ public class Player extends Fragment implements SongChangeListener {
 
                 if(nextSongListPosition>=musicLists.size()) {
                     nextSongListPosition=0;
+
                 }
 
-                musicLists.get(currentSongListPosition).setPlaying(false);
-                musicLists.get(nextSongListPosition).setPlaying(true);
+                if(musicLists.size() == 0)
+                {
+                    Toast.makeText(getActivity(),"No music in list",Toast.LENGTH_SHORT).show();
+                }
 
-                musicAdapter.updateList(musicLists);
-                musicRecyclerView.scrollToPosition(nextSongListPosition);
-                onChanged(nextSongListPosition);
+                else
+                {
+
+                    musicLists.get(currentSongListPosition).setPlaying(false);
+                    musicLists.get(nextSongListPosition).setPlaying(true);
+
+                    musicAdapter.updateList(musicLists);
+                    musicRecyclerView.scrollToPosition(nextSongListPosition);
+                    onChanged(nextSongListPosition);
+                }
+
+
+
+
             }
         });
 
         previousBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 int prevSongListPosition= currentSongListPosition-1;
 
                 if(prevSongListPosition<0) {
                     prevSongListPosition=musicLists.size()-1;//play last song
                 }
 
-                musicLists.get(currentSongListPosition).setPlaying(false);
-                musicLists.get(prevSongListPosition).setPlaying(true);
 
-                musicAdapter.updateList(musicLists);
-                musicRecyclerView.scrollToPosition(prevSongListPosition);
-                onChanged(prevSongListPosition);
+                if(musicLists.size() == 0)
+                {
+                    Toast.makeText(getActivity(),"No music in list",Toast.LENGTH_SHORT).show();
+                }
+
+                else
+                {
+
+                    musicLists.get(currentSongListPosition).setPlaying(false);
+                    musicLists.get(prevSongListPosition).setPlaying(true);
+
+                    musicAdapter.updateList(musicLists);
+                    musicRecyclerView.scrollToPosition(prevSongListPosition);
+                    onChanged(prevSongListPosition);
+                }
             }
         });
 
         playerSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser) {
-                    if(isPlaying) {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+            {
+                if(fromUser)
+                {
+                    isUserInteractingWithSeekBar = true;
+
+                    if(isPlaying)
+                    {
                         mediaPlayer.seekTo(progress);
                     } else {
                         mediaPlayer.seekTo(0);
                     }
                 }
+
+
+
+
             }
+
+
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                isUserInteractingWithSeekBar = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                isUserInteractingWithSeekBar = false;
             }
         });
+
+
+
+
+//        Intent intent = getIntent();
+
+//        uid = intent.getStringExtra("uid");
+//        is_staff = intent.getStringExtra("is_staff");
+//        is_staffBoolean = is_staff.equals("1");
+
+//                swipeRefreshLayout.setRefreshing(false);
+//            }
+//        });
+
+        // Trigger a refresh when the activity starts
+
+        playlist.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                replaceFragmentWithAnother();
+            }
+        });
+
+
+
+
+
+
+
+
+
     }
+    public void replaceFragmentWithAnother()
+    {
+        MusicPlaylist anotherFragment = new MusicPlaylist();
+
+        // Begin the transaction
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+
+        // Replace whatever is in the container view with this fragment
+        transaction.replace(R.id.fragment_container, anotherFragment);
+
+        // Commit the transaction
+        transaction.commit();
+    }
+
+
 
     private void getMusicFiles() {
         ContentResolver contentResolver = getActivity().getContentResolver();
@@ -237,7 +354,9 @@ public class Player extends Fragment implements SongChangeListener {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
-        if(grantResults.length> 0 && grantResults[0]==PackageManager.PERMISSION_GRANTED) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults.length> 0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
+        {
             getMusicFiles();
         } else {
             Toast.makeText(getActivity(),"Permission Declined By User",Toast.LENGTH_SHORT).show();
@@ -312,14 +431,54 @@ public class Player extends Fragment implements SongChangeListener {
                 mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        mediaPlayer.reset();
+                        if (!isUserInteractingWithSeekBar)
+                        {
 
-                        timer.purge();
-                        timer.cancel();
 
-                        isPlaying=false;
-                        playPauseImg.setImageResource(R.drawable.play_icon);
-                        playerSeekBar.setProgress(0);
+
+                            mediaPlayer.reset();
+
+                            timer.purge();
+                            timer.cancel();
+
+                            isPlaying = false;
+                            playPauseImg.setImageResource(R.drawable.play_icon);
+                            playerSeekBar.setProgress(0);
+                            currentSongListPosition++;
+
+
+                            musicAdapter.updateList(musicLists);
+                            musicRecyclerView.scrollToPosition(currentSongListPosition);
+
+
+                            if (currentSongListPosition < musicLists.size()) {
+                                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            if (isAdded()) {
+                                                mediaPlayer.setDataSource(getActivity(), musicLists.get(currentSongListPosition).getMusicFile());
+                                                mediaPlayer.prepare();
+                                                mediaPlayer.start();
+
+
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                            if (isAdded()) {
+                                                Toast.makeText(getActivity(), "Unable to play track", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    }
+                                }).start();
+                            } else {
+                                // Reset the current song position if we've reached the end of the list
+                                currentSongListPosition = 0;
+                            }
+
+
+                        }
                     }
                 });
             }
