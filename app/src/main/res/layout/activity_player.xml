@@ -66,26 +66,26 @@
     </RelativeLayout>
 
 
-
-
     <RelativeLayout
         android:id="@+id/Buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/topBar"
+        android:minHeight="50dp"
         android:orientation="horizontal"
-        android:minHeight="50dp">
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_marginStart="50dp">
-        <Button
-            android:id="@+id/btnPlaylist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Playlist" />
+
+            <Button
+                android:id="@+id/btnPlaylist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Playlist" />
         </LinearLayout>
 
         <LinearLayout
@@ -93,11 +93,13 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="50dp">
-        <Button
-            android:id="@+id/btnBrowse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Browse" />
+
+            <Button
+                android:id="@+id/btnBrowse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Browse"
+                android:visibility="visible" />
         </LinearLayout>
     </RelativeLayout>
 

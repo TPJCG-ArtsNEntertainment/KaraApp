@@ -5,10 +5,12 @@
         android:title="Play"/>
     <item
         android:id="@+id/option_download_video"
-        android:title="Download Video"/>
+        android:title="Download Video"
+        android:visible="false" />
     <item
         android:id="@+id/option_download_music"
-        android:title="Download Music"/>
+        android:title="Download Music"
+        android:visible="false" />
     <item
         android:id="@+id/option_set_played"
         android:title="Set Played"/>
